@@ -18,7 +18,7 @@ puts '日 月 火 水 木 金 土'
 print first_week_spaces
 
 (start_date..end_date).each do |date|
-  formatted_day = "#{date.day.to_s.rjust(2)}"
+  formatted_day = date.day.to_s.rjust(2)
   if date.saturday?
     print "#{formatted_day}\n"
   else
