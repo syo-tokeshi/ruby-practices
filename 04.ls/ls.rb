@@ -20,25 +20,25 @@ files_to_display = files_in_current_path.each_slice(number_column_show).to_a
 
 file_and_file_between_space = 7
 
-def max_filename_each_row(row)
+def row_filename_max_length(row)
   row.map(&:size).max
 end
 
 # 表示する列の最大幅を決める
-displayed_file_array_max_name_number = files_to_display.map do |row|
-  max_filename_each_row(row) + file_and_file_between_space
+displayed_file_max_name_numbers = files_to_display.map do |row|
+  row_filename_max_length(row) + file_and_file_between_space
 end
 
 # グループ化したファイル群を、ljustで、左揃えさせる(その際に、そのグループのファイル名の最大文字数を考慮する)
-adjusted_displayed_file = files_to_display.map.with_index do |row, index|
+adjusted_displayed_files = files_to_display.map.with_index do |row, index|
   row.map do |file_name|
-    file_name.ljust(displayed_file_array_max_name_number[index])
+    file_name.ljust(displayed_file_max_name_numbers[index])
   end
 end
 
-files_displayed_adjusted_by_index_number = adjusted_displayed_file[0].zip(*adjusted_displayed_file[1..])
+adjusted_displayed_files_by_index_number = adjusted_displayed_files[0].zip(*adjusted_displayed_files[1..])
 
-files_displayed_adjusted_by_index_number.each do |column|
+adjusted_displayed_files_by_index_number.each do |column|
   column.count.times do |index|
     print column[index]
   end
