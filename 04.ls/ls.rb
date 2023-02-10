@@ -1,7 +1,11 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-files_in_current_path = Dir.glob('*')
+require 'optparse'
+
+params = ARGV.getopts('a')
+files_in_current_path = params['a'] ? Dir.glob('*', File::FNM_DOTMATCH) : Dir.glob('*')
+
 COLUMN_COUNT_FILE_SHOW = 3
 def file_display_to_required_info(files_in_current_path)
   files_in_current_path.count.divmod(COLUMN_COUNT_FILE_SHOW)
