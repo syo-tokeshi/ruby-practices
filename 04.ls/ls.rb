@@ -22,10 +22,21 @@ TABLE_FILETYPE_ALPHABET = {
 
 COLUMN_COUNT_FILE_SHOW = 3
 FILE_AND_FILE_BETWEEN_SPACE = 7
+PARAMS = ARGV.getopts('r', 'l')
 
-def main
-  params = ARGV.getopts('r', 'l')
-  files_in_current_path = params['r'] ? Dir.glob('*').reverse : Dir.glob('*')
+def main(displayed_files)
+  files_in_current_path, adjusted_displayed_files = *displayed_files
+  adjusted_displayed_files_by_index_number = adjusted_displayed_files[0].zip(*adjusted_displayed_files[1..])
+  max_byte_count_display_path = get_max_byte_count_display_path(files_in_current_path)
+  if PARAMS['l']
+    path_detail_also_display(adjusted_displayed_files, max_byte_count_display_path)
+  else
+    display_without_option(adjusted_displayed_files_by_index_number)
+  end
+end
+
+def displayed_files
+  files_in_current_path = PARAMS['r'] ? Dir.glob('*').reverse : Dir.glob('*')
   number_column_show, remainder_number = files_in_current_path.count.divmod(COLUMN_COUNT_FILE_SHOW)
   number_column_show += 1 if remainder_number.positive?
   files_to_display = files_in_current_path.each_slice(number_column_show).to_a
@@ -37,30 +48,32 @@ def main
       file_name.ljust(displayed_file_max_name_numbers[index])
     end
   end
-  adjusted_displayed_files_by_index_number = adjusted_displayed_files[0].zip(*adjusted_displayed_files[1..])
-  max_byte_count_display_path = get_max_byte_count_display_path(files_in_current_path)
-  if params['l']
-    adjusted_displayed_files.each do |columns|
-      columns.each do |column|
-        next if column.nil?
+  [files_in_current_path, adjusted_displayed_files]
+end
 
-        removed_space_column = column.strip
-        if FileTest.symlink?(removed_space_column)
-          symbolic_name_to_display = "#{removed_space_column} -> #{File.readlink(removed_space_column)}"
-          puts "#{display_file_type_and_permission(removed_space_column)} #{show_remaining_detail(removed_space_column,
-                                                                                                  max_byte_count_display_path)} #{symbolic_name_to_display}"
-        else
-          puts "#{display_file_type_and_permission(removed_space_column)} #{show_remaining_detail(removed_space_column,
-                                                                                                  max_byte_count_display_path)} #{removed_space_column}"
-        end
-      end
+def display_without_option(adjusted_displayed_files_by_index_number)
+  adjusted_displayed_files_by_index_number.each do |columns|
+    columns.each do |column|
+      print column
     end
-  else
-    adjusted_displayed_files_by_index_number.each do |columns|
-      columns.each do |column|
-        print column
+    print "\n"
+  end
+end
+
+def path_detail_also_display(adjusted_displayed_files, max_byte_count_display_path)
+  adjusted_displayed_files.each do |columns|
+    columns.each do |column|
+      next if column.nil?
+
+      removed_space_column = column.strip
+      if FileTest.symlink?(removed_space_column)
+        symbolic_name_to_display = "#{removed_space_column} -> #{File.readlink(removed_space_column)}"
+        puts "#{display_file_type_and_permission(removed_space_column)} #{show_remaining_detail(removed_space_column,
+                                                                                                max_byte_count_display_path)} #{symbolic_name_to_display}"
+      else
+        puts "#{display_file_type_and_permission(removed_space_column)} #{show_remaining_detail(removed_space_column,
+                                                                                                max_byte_count_display_path)} #{removed_space_column}"
       end
-      print "\n"
     end
   end
 end
@@ -110,4 +123,4 @@ def show_remaining_detail(file, max_byte_count_display_path)
   [hard_link_count, owner_name, group_name, bite_size, updated_date].flatten.join('  ')
 end
 
-main
+main(displayed_files)
