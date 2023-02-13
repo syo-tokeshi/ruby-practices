@@ -37,7 +37,7 @@ def get_array_of_file_type_and_permissions(string_of_file_type_and_permissions)
   [owner,group,user,file_type]
 end
 
-params = ARGV.getopts('r')
+params = ARGV.getopts('r', 'l')
 files_in_current_path = if params['r']
                           Dir.glob('*').reverse
                         else
@@ -73,9 +73,17 @@ end
 
 adjusted_displayed_files_by_index_number = adjusted_displayed_files[0].zip(*adjusted_displayed_files[1..])
 
-adjusted_displayed_files_by_index_number.each do |columns|
-  columns.each do |column|
-    print column
+if params['l']
+  adjusted_displayed_files_by_index_number.each do |columns|
+    columns.each do |column|
+      print column
+    end
   end
-  print "\n"
+else
+  adjusted_displayed_files_by_index_number.each do |columns|
+    columns.each do |column|
+      print column
+    end
+    print "\n"
+  end
 end
