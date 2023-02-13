@@ -116,14 +116,13 @@ def display_path_size_detail(files_in_current_path)
   [max_byte_count_display_path, sum_blocks_count_display_path]
 end
 
-def show_remaining_detail(file, display_path_size_detail)
-  max_byte_count_display_path = display_path_size_detail[0]
+def show_remaining_detail(file, max_byte_count_display_path)
   file_hold_detail = File::Stat.new(File.open(file))
   hard_link_count = file_hold_detail.nlink
   owner_name = Etc.getpwuid(file_hold_detail.uid).name
   group_name = Etc.getgrgid(file_hold_detail.gid).name
   bite_size = file_hold_detail.size.to_s.rjust(max_byte_count_display_path)
-  updated_date = file_hold_detail.mtime.strftime('%_m月 %_d %H:%M')
+  updated_date = file_hold_detail.mtime.strftime('%_m %_d %H:%M')
   [hard_link_count, owner_name, group_name, bite_size, updated_date].flatten.join('  ')
 end
 
