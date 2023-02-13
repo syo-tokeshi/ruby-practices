@@ -27,7 +27,8 @@ PARAMS = ARGV.getopts('r', 'l')
 def main(displayed_files)
   files_in_current_path, adjusted_displayed_files = *displayed_files
   adjusted_displayed_files_by_index_number = adjusted_displayed_files[0].zip(*adjusted_displayed_files[1..])
-  max_byte_count_display_path = get_max_byte_count_display_path(files_in_current_path)
+  max_byte_count_display_path, sum_blocks_count_display_path = display_path_size_detail(files_in_current_path)
+  puts "total #{sum_blocks_count_display_path}"
   if PARAMS['l']
     path_detail_also_display(adjusted_displayed_files, max_byte_count_display_path)
   else
@@ -106,14 +107,17 @@ def display_file_type_and_permission(file)
   [file_type, permissions].flatten.join
 end
 
-def get_max_byte_count_display_path(files_in_current_path)
-  files_max_byte_number = files_in_current_path.map do |file|
-    File::Stat.new(File.open(file)).size.to_s
+def display_path_size_detail(files_in_current_path)
+  files_with_detail_information = files_in_current_path.map do |file|
+    File::Stat.new(File.open(file))
   end
-  files_max_byte_number.map(&:size).max
+  max_byte_count_display_path = files_with_detail_information.map(&:size).map(&:to_s).map(&:size).max
+  sum_blocks_count_display_path = files_with_detail_information.map(&:blocks).sum
+  [max_byte_count_display_path, sum_blocks_count_display_path]
 end
 
-def show_remaining_detail(file, max_byte_count_display_path)
+def show_remaining_detail(file, display_path_size_detail)
+  max_byte_count_display_path = display_path_size_detail[0]
   file_hold_detail = File::Stat.new(File.open(file))
   hard_link_count = file_hold_detail.nlink
   owner_name = Etc.getpwuid(file_hold_detail.uid).name
