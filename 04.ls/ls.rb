@@ -3,9 +3,12 @@
 
 require 'optparse'
 
-params = ARGV.getopts('a')
-flags = params['a'] ? File::FNM_DOTMATCH : 0
-files_in_current_path = Dir.glob('*', flags)
+params = ARGV.getopts('r')
+files_in_current_path = if params['r']
+                          Dir.glob('*').reverse
+                        else
+                          Dir.glob('*')
+                        end
 
 COLUMN_COUNT_FILE_SHOW = 3
 def file_display_to_required_info(files_in_current_path)
