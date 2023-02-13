@@ -2,6 +2,40 @@
 # frozen_string_literal: true
 
 require 'optparse'
+require "etc"
+
+TABLE_NUMERIC_ALPHABET = {
+  '0' => '-',
+  '1' => 'x--',
+  '2' => 'w--',
+  '4' => 'r--',
+  '5' => 'r-x',
+  '6' => 'rw-',
+  '7' => 'rwx'
+}.freeze
+
+TABLE_FILETYPE_ALPHABET = {
+  '100' => '-',
+  '40' => 'd',
+}.freeze
+
+def make_authority_alphabetic(permissions)
+  permissions.map{ |permission|
+    TABLE_NUMERIC_ALPHABET[permission]
+  }
+end
+
+def change_number_to_file_type(file_type)
+  TABLE_FILETYPE_ALPHABET[file_type]
+end
+
+def get_array_of_file_type_and_permissions(string_of_file_type_and_permissions)
+  user = string_of_file_type_and_permissions.slice!(-1)
+  group = string_of_file_type_and_permissions.slice!(-1)
+  owner = string_of_file_type_and_permissions.slice!(-1)
+  file_type = string_of_file_type_and_permissions
+  [owner,group,user,file_type]
+end
 
 params = ARGV.getopts('r')
 files_in_current_path = if params['r']
