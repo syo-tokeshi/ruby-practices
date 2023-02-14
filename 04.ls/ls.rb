@@ -28,7 +28,6 @@ def main(displayed_files)
   files_in_current_path, adjusted_displayed_files = *displayed_files
   adjusted_displayed_files_by_index_number = adjusted_displayed_files[0].zip(*adjusted_displayed_files[1..])
   max_byte_count_display_path, sum_blocks_count_display_path = display_path_size_detail(files_in_current_path)
-  # debugger
   if PARAMS['l']
     puts "total #{sum_blocks_count_display_path}" if files_in_current_path.count >= 2
     path_detail_also_display(adjusted_displayed_files, max_byte_count_display_path)
