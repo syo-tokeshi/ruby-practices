@@ -22,7 +22,7 @@ TABLE_FILETYPE_ALPHABET = {
 
 COLUMN_COUNT_FILE_SHOW = 3
 FILE_AND_FILE_BETWEEN_SPACE = 7
-PARAMS = ARGV.getopts('r', 'l')
+PARAMS = ARGV.getopts('a', 'r', 'l')
 
 def main(displayed_files)
   files_in_current_path, adjusted_displayed_files = *displayed_files
@@ -37,7 +37,7 @@ def main(displayed_files)
 end
 
 def displayed_files
-  files_in_current_path = PARAMS['r'] ? Dir.glob('*').reverse : Dir.glob('*')
+  files_in_current_path = change_state_files_by_option
   number_column_show, remainder_number = files_in_current_path.count.divmod(COLUMN_COUNT_FILE_SHOW)
   number_column_show += 1 if remainder_number.positive?
   files_to_display = files_in_current_path.each_slice(number_column_show).to_a
@@ -50,6 +50,13 @@ def displayed_files
     end
   end
   [files_in_current_path, adjusted_displayed_files]
+end
+
+def change_state_files_by_option
+  flags = PARAMS['a'] ? File::FNM_DOTMATCH : 0
+  files_in_current_path = Dir.glob('*', flags)
+  files_in_current_path.reverse! if PARAMS['r']
+  files_in_current_path
 end
 
 def display_without_option(adjusted_displayed_files_by_index_number)
