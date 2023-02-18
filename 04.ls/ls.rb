@@ -75,8 +75,8 @@ def display_with_detail(lists, max_byte_count)
 
       removed_space_column = column.strip
       if FileTest.symlink?(removed_space_column)
-        symbolic_name_to_display = "#{removed_space_column} -> #{File.readlink(removed_space_column)}"
-        puts "#{file_type_and_permissions(removed_space_column)} #{remaining_details(removed_space_column, max_byte_count)} #{symbolic_name_to_display}"
+        symbolic_name = "#{removed_space_column} -> #{File.readlink(removed_space_column)}"
+        puts "#{file_type_and_permissions(removed_space_column)} #{remaining_details(removed_space_column, max_byte_count)} #{symbolic_name}"
       else
         puts "#{file_type_and_permissions(removed_space_column)} #{remaining_details(removed_space_column, max_byte_count)} #{removed_space_column}"
       end
