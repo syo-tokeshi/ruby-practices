@@ -37,7 +37,7 @@ def main(displayed_lists)
 end
 
 def displayed_lists
-  path_lists = change_state_lists_by_option
+  path_lists = change_state_lists
   display_column_count, remainder_count = path_lists.count.divmod(DISPLAY_COLUMN_COUNT)
   display_column_count += 1 if remainder_count.positive?
   display_files = path_lists.each_slice(display_column_count).to_a
@@ -52,7 +52,7 @@ def displayed_lists
   [path_lists, adjusted_displayed_lists]
 end
 
-def change_state_lists_by_option
+def change_state_lists
   flags = PARAMS['a'] ? File::FNM_DOTMATCH : 0
   path_lists = Dir.glob('*', flags)
   path_lists.reverse! if PARAMS['r']
