@@ -1,15 +1,27 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require 'optparse'
 require 'debug'
+
+PARAMS = ARGV.getopts('l', 'w', 'c')
 
 def main
   if ARGV.any?
-    file_count
+    info_to_display = file_count
+    calc_arg_info(info_to_display)
   else
     params = $stdin.readlines
     input_count(params)
   end
+end
+
+def calc_arg_info(info_to_display)
+  sum_files = info_to_display.map(&:sum)
+  displayed_arg_info = info_to_display.each_with_index { |row,i |
+    row << sum_files[i]
+  }
+  p displayed_arg_info
 end
 
 # 引数で渡されたファイルを調べる
@@ -17,9 +29,17 @@ def file_count
   loaded_files = ARGV.map do
     File.read(_1)
   end
-  count_lines(loaded_files)
-  count_words(loaded_files)
-  count_characters(loaded_files)
+  info_to_display = []
+  if !PARAMS.values.any?
+    info_to_display << count_lines(loaded_files)
+    info_to_display << count_words(loaded_files)
+    info_to_display << count_characters(loaded_files)
+  else
+    info_to_display << count_lines(loaded_files) if PARAMS['l']
+    info_to_display << count_words(loaded_files) if PARAMS['w']
+    info_to_display << count_characters(loaded_files) if PARAMS['c']
+  end
+  info_to_display
 end
 
 # 行数
