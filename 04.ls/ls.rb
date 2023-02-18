@@ -41,12 +41,12 @@ def displayed_lists
   display_column_count, remainder_count = path_lists.count.divmod(COLUMN_COUNT)
   display_column_count += 1 if remainder_count.positive?
   display_files = path_lists.each_slice(display_column_count).to_a
-  displayed_file_max_name_numbers = display_files.map do |row|
+  display_widths = display_files.map do |row|
     row.map(&:size).max + COLUMN_SPACE
   end
   adjusted_displayed_lists = display_files.map.with_index do |row, index|
     row.map do |file_name|
-      file_name.ljust(displayed_file_max_name_numbers[index])
+      file_name.ljust(display_widths[index])
     end
   end
   [path_lists, adjusted_displayed_lists]
