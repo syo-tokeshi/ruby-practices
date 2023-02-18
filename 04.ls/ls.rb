@@ -20,8 +20,8 @@ TYPE_LISTS = {
   '120' => 'l'
 }.freeze
 
-DISPLAY_COLUMN_COUNT = 3
-DISPLAY_COLUMN_SPACE = 7
+COLUMN_COUNT = 3
+COLUMN_SPACE = 7
 PARAMS = ARGV.getopts('a', 'r', 'l')
 
 def main(displayed_lists)
@@ -38,11 +38,11 @@ end
 
 def displayed_lists
   path_lists = change_state_lists
-  display_column_count, remainder_count = path_lists.count.divmod(DISPLAY_COLUMN_COUNT)
+  display_column_count, remainder_count = path_lists.count.divmod(COLUMN_COUNT)
   display_column_count += 1 if remainder_count.positive?
   display_files = path_lists.each_slice(display_column_count).to_a
   displayed_file_max_name_numbers = display_files.map do |row|
-    row.map(&:size).max + DISPLAY_COLUMN_SPACE
+    row.map(&:size).max + COLUMN_SPACE
   end
   adjusted_displayed_lists = display_files.map.with_index do |row, index|
     row.map do |file_name|
