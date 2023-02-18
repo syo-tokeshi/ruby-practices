@@ -59,8 +59,8 @@ def change_state_lists
   path_lists
 end
 
-def display_without_detail(adjusted_displayed_lists)
-  adjusted_displayed_lists.each do |columns|
+def display_without_detail(lists)
+  lists.each do |columns|
     columns.each do |column|
       print column
     end
@@ -68,8 +68,8 @@ def display_without_detail(adjusted_displayed_lists)
   end
 end
 
-def display_with_detail(adjusted_displayed_lists, max_byte_count_display_path)
-  adjusted_displayed_lists.each do |columns|
+def display_with_detail(lists, max_byte_count)
+  lists.each do |columns|
     columns.each do |column|
       next if column.nil?
 
@@ -77,10 +77,10 @@ def display_with_detail(adjusted_displayed_lists, max_byte_count_display_path)
       if FileTest.symlink?(removed_space_column)
         symbolic_name_to_display = "#{removed_space_column} -> #{File.readlink(removed_space_column)}"
         puts "#{file_type_and_permission(removed_space_column)} #{remaining_details(removed_space_column,
-                                                                                    max_byte_count_display_path)} #{symbolic_name_to_display}"
+                                                                                    max_byte_count)} #{symbolic_name_to_display}"
       else
         puts "#{file_type_and_permission(removed_space_column)} #{remaining_details(removed_space_column,
-                                                                                    max_byte_count_display_path)} #{removed_space_column}"
+                                                                                    max_byte_count)} #{removed_space_column}"
       end
     end
   end
