@@ -9,10 +9,22 @@ PARAMS = ARGV.getopts('l', 'w', 'c')
 def main
   if ARGV.any?
     info_to_display = file_count
-    calc_arg_info(info_to_display)
+    displayed_arg_info = calc_arg_info(info_to_display)
+    displayed_wc(displayed_arg_info)
   else
     params = $stdin.readlines
     input_count(params)
+  end
+end
+
+def displayed_wc(displayed_arg_info)
+  displayed_count = PARAMS.values.count(true) + 1
+  displayed_count = 4 if PARAMS.values.count(true) == 0
+  displayed_arg_info.transpose.each do |rows|
+    rows.each.with_index(1) do |row, i|
+      print row.to_s.rjust(8.5) if i % displayed_count != 0
+      print "#{row}\n" if i % displayed_count == 0
+    end
   end
 end
 
@@ -21,7 +33,13 @@ def calc_arg_info(info_to_display)
   displayed_arg_info = info_to_display.each_with_index { |row,i |
     row << sum_files[i]
   }
-  p displayed_arg_info
+  # debugger
+  last_columns = ARGV.map do
+    " #{File.path(_1)}"
+  end
+  last_columns << " total"
+  displayed_arg_info << last_columns
+  # debugger
 end
 
 # 引数で渡されたファイルを調べる
@@ -47,7 +65,7 @@ def count_lines(files)
   files_lines = files.map do
     _1.lines.count
   end
-  p files_lines
+    files_lines
 end
 
 # 単語数
@@ -55,15 +73,16 @@ def count_words(files)
   files_words = files.map do
     _1.split(/\s+/).size
   end
-  p files_words
+    files_words
 end
 
 # 文字数
 def count_characters(files)
   files_characters = files.map do
     _1.split(/\s+/).join.chars.size
+    # debugger
   end
-  p files_characters
+    files_characters
 end
 
 # 標準入力を調べる
