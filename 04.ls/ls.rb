@@ -16,13 +16,13 @@ PERMISSION_LISTS = {
 
 TYPE_LISTS = {
   '100' => '-',
-  '40' => 'd',
+  '40'  => 'd',
   '120' => 'l'
 }.freeze
 
 COLUMN_COUNT = 3
 COLUMN_SPACE = 7
-PARAMS = ARGV.getopts('a', 'r', 'l')
+PARAMS       = ARGV.getopts('a', 'r', 'l')
 
 def main(displayed_lists)
   current_path_lists, displayed_lists = *displayed_lists
