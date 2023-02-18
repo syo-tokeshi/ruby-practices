@@ -4,7 +4,7 @@
 require 'optparse'
 require 'etc'
 
-TABLE_NUMERIC_ALPHABET = {
+PERMISSION_LISTS = {
   '0' => '---',
   '1' => 'x--',
   '2' => 'w--',
@@ -14,53 +14,53 @@ TABLE_NUMERIC_ALPHABET = {
   '7' => 'rwx'
 }.freeze
 
-TABLE_FILETYPE_ALPHABET = {
+TYPE_LISTS = {
   '100' => '-',
   '40' => 'd',
   '120' => 'l'
 }.freeze
 
-COLUMN_COUNT_FILE_SHOW = 3
-FILE_AND_FILE_BETWEEN_SPACE = 7
+DISPLAY_COLUMN_COUNT = 3
+DISPLAY_COLUMN_SPACE = 7
 PARAMS = ARGV.getopts('a', 'r', 'l')
 
-def main(displayed_files)
-  files_in_current_path, adjusted_displayed_files = *displayed_files
-  adjusted_displayed_files_by_index_number = adjusted_displayed_files[0].zip(*adjusted_displayed_files[1..])
-  max_byte_count_display_path, sum_blocks_count_display_path = display_path_size_detail(files_in_current_path)
+def main(displayed_lists)
+  current_path_lists, displayed_lists = *displayed_lists
+  default_lists = displayed_lists[0].zip(*displayed_lists[1..])
+  max_byte_count, sum_blocks_count = details_path_size(current_path_lists)
   if PARAMS['l']
-    puts "total #{sum_blocks_count_display_path}" if files_in_current_path.count >= 2
-    path_detail_also_display(adjusted_displayed_files, max_byte_count_display_path)
+    puts "total #{sum_blocks_count}" if current_path_lists.count >= 2
+    display_with_detail(displayed_lists, max_byte_count)
   else
-    display_without_option(adjusted_displayed_files_by_index_number)
+    display_without_detail(default_lists)
   end
 end
 
-def displayed_files
-  files_in_current_path = change_state_files_by_option
-  number_column_show, remainder_number = files_in_current_path.count.divmod(COLUMN_COUNT_FILE_SHOW)
-  number_column_show += 1 if remainder_number.positive?
-  files_to_display = files_in_current_path.each_slice(number_column_show).to_a
-  displayed_file_max_name_numbers = files_to_display.map do |row|
-    row.map(&:size).max + FILE_AND_FILE_BETWEEN_SPACE
+def displayed_lists
+  path_lists = change_state_lists_by_option
+  display_column_count, remainder_count = path_lists.count.divmod(DISPLAY_COLUMN_COUNT)
+  display_column_count += 1 if remainder_count.positive?
+  display_files = path_lists.each_slice(display_column_count).to_a
+  displayed_file_max_name_numbers = display_files.map do |row|
+    row.map(&:size).max + DISPLAY_COLUMN_SPACE
   end
-  adjusted_displayed_files = files_to_display.map.with_index do |row, index|
+  adjusted_displayed_lists = display_files.map.with_index do |row, index|
     row.map do |file_name|
       file_name.ljust(displayed_file_max_name_numbers[index])
     end
   end
-  [files_in_current_path, adjusted_displayed_files]
+  [path_lists, adjusted_displayed_lists]
 end
 
-def change_state_files_by_option
+def change_state_lists_by_option
   flags = PARAMS['a'] ? File::FNM_DOTMATCH : 0
-  files_in_current_path = Dir.glob('*', flags)
-  files_in_current_path.reverse! if PARAMS['r']
-  files_in_current_path
+  path_lists = Dir.glob('*', flags)
+  path_lists.reverse! if PARAMS['r']
+  path_lists
 end
 
-def display_without_option(adjusted_displayed_files_by_index_number)
-  adjusted_displayed_files_by_index_number.each do |columns|
+def display_without_detail(adjusted_displayed_lists)
+  adjusted_displayed_lists.each do |columns|
     columns.each do |column|
       print column
     end
@@ -68,69 +68,69 @@ def display_without_option(adjusted_displayed_files_by_index_number)
   end
 end
 
-def path_detail_also_display(adjusted_displayed_files, max_byte_count_display_path)
-  adjusted_displayed_files.each do |columns|
+def display_with_detail(adjusted_displayed_lists, max_byte_count_display_path)
+  adjusted_displayed_lists.each do |columns|
     columns.each do |column|
       next if column.nil?
 
       removed_space_column = column.strip
       if FileTest.symlink?(removed_space_column)
         symbolic_name_to_display = "#{removed_space_column} -> #{File.readlink(removed_space_column)}"
-        puts "#{display_file_type_and_permission(removed_space_column)} #{show_remaining_detail(removed_space_column,
-                                                                                                max_byte_count_display_path)} #{symbolic_name_to_display}"
+        puts "#{file_type_and_permission(removed_space_column)} #{remaining_details(removed_space_column,
+                                                                                    max_byte_count_display_path)} #{symbolic_name_to_display}"
       else
-        puts "#{display_file_type_and_permission(removed_space_column)} #{show_remaining_detail(removed_space_column,
-                                                                                                max_byte_count_display_path)} #{removed_space_column}"
+        puts "#{file_type_and_permission(removed_space_column)} #{remaining_details(removed_space_column,
+                                                                                    max_byte_count_display_path)} #{removed_space_column}"
       end
     end
   end
 end
 
-def make_authority_alphabetic(permissions)
-  permissions.map do |permission|
-    TABLE_NUMERIC_ALPHABET[permission]
+def alphabetic_permissions(numeric_permissions)
+  numeric_permissions.map do
+    PERMISSION_LISTS[_1]
   end
 end
 
-def change_number_to_file_type(file_type)
-  TABLE_FILETYPE_ALPHABET[file_type]
+def alphabetic_list_type(numeric_file_type)
+  TYPE_LISTS[numeric_file_type]
 end
 
-def get_file_type_and_permissions(string_of_file_type_and_permissions)
-  user = string_of_file_type_and_permissions.slice!(-1)
-  group = string_of_file_type_and_permissions.slice!(-1)
-  owner = string_of_file_type_and_permissions.slice!(-1)
-  file_type = string_of_file_type_and_permissions
+def divide(file_mode)
+  user = file_mode.slice!(-1)
+  group = file_mode.slice!(-1)
+  owner = file_mode.slice!(-1)
+  file_type = file_mode
   [owner, group, user, file_type]
 end
 
-def display_file_type_and_permission(file)
-  file_hold_detail = File::Stat.new(File.open(file))
-  string_of_file_type_and_permissions = file_hold_detail.mode.to_s(8)
-  array_of_file_type_and_permissions = get_file_type_and_permissions(string_of_file_type_and_permissions)
-  file_type = change_number_to_file_type(array_of_file_type_and_permissions.last)
-  permissions = make_authority_alphabetic(array_of_file_type_and_permissions[0..2])
-  file_type = 'l' if FileTest.symlink?(file)
-  [file_type, permissions].flatten.join
+def file_type_and_permission(file)
+  has_detail_file = File::Stat.new(File.open(file))
+  file_mode = has_detail_file.mode.to_s(8)
+  type_and_permissions = divide(file_mode)
+  list_type = alphabetic_list_type(type_and_permissions.last)
+  permissions = alphabetic_permissions(type_and_permissions[0..2])
+  list_type = 'l' if FileTest.symlink?(file)
+  [list_type, permissions].flatten.join
 end
 
-def display_path_size_detail(files_in_current_path)
-  files_with_detail_information = files_in_current_path.map do |file|
-    File::Stat.new(File.open(file))
+def details_path_size(path_lists)
+  lists_detail = path_lists.map do
+    File::Stat.new(File.open(_1))
   end
-  max_byte_count_display_path = files_with_detail_information.map(&:size).map(&:to_s).map(&:size).max
-  sum_blocks_count_display_path = files_with_detail_information.map(&:blocks).sum
-  [max_byte_count_display_path, sum_blocks_count_display_path]
+  max_byte_count = lists_detail.map(&:size).map(&:to_s).map(&:size).max
+  sum_blocks_count = lists_detail.map(&:blocks).sum
+  [max_byte_count, sum_blocks_count]
 end
 
-def show_remaining_detail(file, max_byte_count_display_path)
-  file_hold_detail = File::Stat.new(File.open(file))
-  hard_link_count = file_hold_detail.nlink
-  owner_name = Etc.getpwuid(file_hold_detail.uid).name
-  group_name = Etc.getgrgid(file_hold_detail.gid).name
-  bite_size = file_hold_detail.size.to_s.rjust(max_byte_count_display_path)
-  updated_date = file_hold_detail.mtime.strftime('%_m %_d %H:%M')
+def remaining_details(file, max_byte_count)
+  has_detail_file = File::Stat.new(File.open(file))
+  hard_link_count = has_detail_file.nlink
+  owner_name = Etc.getpwuid(has_detail_file.uid).name
+  group_name = Etc.getgrgid(has_detail_file.gid).name
+  bite_size = has_detail_file.size.to_s.rjust(max_byte_count)
+  updated_date = has_detail_file.mtime.strftime('%_m %_d %H:%M')
   [hard_link_count, owner_name, group_name, bite_size, updated_date].flatten.join('  ')
 end
 
-main(displayed_files)
+main(displayed_lists)
