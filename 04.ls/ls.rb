@@ -76,10 +76,10 @@ def display_with_detail(lists, max_byte_count)
       removed_space_column = column.strip
       if FileTest.symlink?(removed_space_column)
         symbolic_name_to_display = "#{removed_space_column} -> #{File.readlink(removed_space_column)}"
-        puts "#{file_type_and_permission(removed_space_column)} #{remaining_details(removed_space_column,
+        puts "#{file_type_and_permissions(removed_space_column)} #{remaining_details(removed_space_column,
                                                                                     max_byte_count)} #{symbolic_name_to_display}"
       else
-        puts "#{file_type_and_permission(removed_space_column)} #{remaining_details(removed_space_column,
+        puts "#{file_type_and_permissions(removed_space_column)} #{remaining_details(removed_space_column,
                                                                                     max_byte_count)} #{removed_space_column}"
       end
     end
@@ -104,7 +104,7 @@ def divide(file_mode)
   [owner, group, user, file_type]
 end
 
-def file_type_and_permission(file)
+def file_type_and_permissions(file)
   has_detail_file = File::Stat.new(File.open(file))
   file_mode = has_detail_file.mode.to_s(8)
   type_and_permissions = divide(file_mode)
