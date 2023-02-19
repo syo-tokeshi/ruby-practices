@@ -104,6 +104,7 @@ def create_display_stdin_data(stdin_data)
     display_data << count_stdin_word(stdin_data) if WC_OPTIONS['w']
     display_data << count_stdin_character(stdin_data) if WC_OPTIONS['c']
   end
+  display_data
 end
 
 def count_stdin_line(divided_standard_input)
