@@ -22,12 +22,12 @@ TYPE_TABLE = {
 
 COLUMN_COUNT = 3
 COLUMN_SPACE = 7
-PARAMS       = ARGV.getopts('a', 'r', 'l')
+PARAMS = ARGV.getopts('a', 'r', 'l')
 
 def main(displayed_lists)
   current_path_lists, displayed_lists = *displayed_lists
   default_lists = displayed_lists[0].zip(*displayed_lists[1..])
-  max_byte_count, sum_blocks_count = details_path_size(current_path_lists)
+  max_byte_count, sum_blocks_count = get_details_path_size(current_path_lists)
   if PARAMS['l']
     puts "total #{sum_blocks_count}" if current_path_lists.count >= 2
     display_with_detail(displayed_lists, max_byte_count)
@@ -76,21 +76,21 @@ def display_with_detail(lists, max_byte_count)
       removed_space_column = column.strip
       if FileTest.symlink?(removed_space_column)
         symbolic_name = "#{removed_space_column} -> #{File.readlink(removed_space_column)}"
-        puts "#{file_type_and_permissions(removed_space_column)} #{remaining_details(removed_space_column, max_byte_count)} #{symbolic_name}"
+        puts "#{display_file_type_and_permissions(removed_space_column)} #{display_remaining_details(removed_space_column, max_byte_count)} #{symbolic_name}"
       else
-        puts "#{file_type_and_permissions(removed_space_column)} #{remaining_details(removed_space_column, max_byte_count)} #{removed_space_column}"
+        puts "#{display_file_type_and_permissions(removed_space_column)} #{display_remaining_details(removed_space_column, max_byte_count)} #{removed_space_column}"
       end
     end
   end
 end
 
-def alphabetic_permissions(numeric_permissions)
+def convert_alphabetic_permissions(numeric_permissions)
   numeric_permissions.map do
     PERMISSION_TABLE[_1]
   end
 end
 
-def alphabetic_list_type(numeric_file_type)
+def convert_alphabetic_list_type(numeric_file_type)
   TYPE_TABLE[numeric_file_type]
 end
 
@@ -102,17 +102,17 @@ def divide(file_mode)
   [owner, group, user, file_type]
 end
 
-def file_type_and_permissions(file)
+def display_file_type_and_permissions(file)
   has_detail_file = File::Stat.new(File.open(file))
   file_mode = has_detail_file.mode.to_s(8)
   type_and_permissions = divide(file_mode)
-  list_type = alphabetic_list_type(type_and_permissions.last)
-  permissions = alphabetic_permissions(type_and_permissions[0..2])
+  list_type = convert_alphabetic_list_type(type_and_permissions.last)
+  permissions = convert_alphabetic_permissions(type_and_permissions[0..2])
   list_type = 'l' if FileTest.symlink?(file)
   [list_type, permissions].flatten.join
 end
 
-def details_path_size(path_lists)
+def get_details_path_size(path_lists)
   lists_detail = path_lists.map do
     File::Stat.new(File.open(_1))
   end
@@ -121,7 +121,7 @@ def details_path_size(path_lists)
   [max_byte_count, sum_blocks_count]
 end
 
-def remaining_details(file, max_byte_count)
+def display_remaining_details(file, max_byte_count)
   has_detail_file = File::Stat.new(File.open(file))
   hard_link_count = has_detail_file.nlink
   owner_name = Etc.getpwuid(has_detail_file.uid).name
