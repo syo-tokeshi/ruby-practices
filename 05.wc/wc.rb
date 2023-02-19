@@ -21,6 +21,65 @@ def main
   end
 end
 
+# 標準入力を調べる
+def input_count(params)
+  divided_standard_input = params.map do
+    [_1]
+  end
+  divided_standard_input
+  info_to_display = []
+  if !PARAMS.values.any?
+    info_to_display << count_displayed_line(divided_standard_input)
+    info_to_display << count_displayed_word(divided_standard_input)
+    info_to_display << count_displayed_character(divided_standard_input)
+  else
+    info_to_display << count_displayed_line(divided_standard_input) if PARAMS['l']
+    info_to_display << count_displayed_word(divided_standard_input) if PARAMS['w']
+    info_to_display << count_displayed_character(divided_standard_input) if PARAMS['c']
+  end
+  displayed_standard_input(info_to_display)
+end
+
+def displayed_standard_input(info_to_display)
+  info_to_display.each do |row|
+      print row.to_s.rjust(8.5)
+  end
+end
+
+def count_displayed_line(divided_standard_input)
+  divided_standard_input.count
+end
+
+def count_displayed_word(divided_standard_input)
+  word_counts = divided_standard_input.map do |line|
+    line.join.scan(/\S+/).count
+  end
+  word_counts.sum
+end
+
+def count_displayed_character(divided_standard_input)
+  divided_standard_input.flatten.join.size
+end
+
+
+# 引数で渡されたファイルを調べる
+def file_count
+  loaded_files = ARGV.map do
+    File.read(_1)
+  end
+  info_to_display = []
+  if !PARAMS.values.any?
+    info_to_display << count_lines(loaded_files)
+    info_to_display << count_words(loaded_files)
+    info_to_display << count_characters(loaded_files)
+  else
+    info_to_display << count_lines(loaded_files) if PARAMS['l']
+    info_to_display << count_words(loaded_files) if PARAMS['w']
+    info_to_display << count_characters(loaded_files) if PARAMS['c']
+  end
+  info_to_display
+end
+
 def displayed_wc(displayed_arg_info)
   displayed_count = PARAMS.values.count(true) + 1
   displayed_count = 4 if PARAMS.values.count(true) == 0
@@ -44,24 +103,6 @@ def calc_arg_info(info_to_display)
   last_columns << " total"
   displayed_arg_info << last_columns
   # debugger
-end
-
-# 引数で渡されたファイルを調べる
-def file_count
-  loaded_files = ARGV.map do
-    File.read(_1)
-  end
-  info_to_display = []
-  if !PARAMS.values.any?
-    info_to_display << count_lines(loaded_files)
-    info_to_display << count_words(loaded_files)
-    info_to_display << count_characters(loaded_files)
-  else
-    info_to_display << count_lines(loaded_files) if PARAMS['l']
-    info_to_display << count_words(loaded_files) if PARAMS['w']
-    info_to_display << count_characters(loaded_files) if PARAMS['c']
-  end
-  info_to_display
 end
 
 # 行数
@@ -93,11 +134,6 @@ def count_characters(files)
     _1.size
   end
     files_characters
-end
-
-# 標準入力を調べる
-def input_count(params)
-  p params
 end
 
 main
