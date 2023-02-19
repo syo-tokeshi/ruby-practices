@@ -4,7 +4,7 @@
 require 'optparse'
 require 'etc'
 
-PERMISSION_LISTS = {
+PERMISSION_TABLE = {
   '0' => '---',
   '1' => 'x--',
   '2' => 'w--',
@@ -14,7 +14,7 @@ PERMISSION_LISTS = {
   '7' => 'rwx'
 }.freeze
 
-TYPE_LISTS = {
+TYPE_TABLE = {
   '100' => '-',
   '40' => 'd',
   '120' => 'l'
@@ -86,12 +86,12 @@ end
 
 def alphabetic_permissions(numeric_permissions)
   numeric_permissions.map do
-    PERMISSION_LISTS[_1]
+    PERMISSION_TABLE[_1]
   end
 end
 
 def alphabetic_list_type(numeric_file_type)
-  TYPE_LISTS[numeric_file_type]
+  TYPE_TABLE[numeric_file_type]
 end
 
 def divide(file_mode)
