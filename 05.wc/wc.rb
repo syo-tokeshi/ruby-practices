@@ -8,8 +8,10 @@ WC_OPTIONS = ARGV.getopts('l', 'w', 'c')
 
 def main
   if ARGV.any?
-    loaded_files = load_file_data
-    displayed_data = create_display_data(loaded_files)
+    loaded_files = ARGV.map do
+      File.read(_1)
+    end
+    displayed_data = create_display_file_data(loaded_files)
     displayed_data_by_condition = if loaded_files.count >= 2
                            calculate_total_value(displayed_data)
                          else
@@ -18,68 +20,27 @@ def main
                          end
     display(displayed_data_by_condition)
   else
-    params = $stdin.readlines
-    input_count(params)
+    stdin_data = $stdin.readlines
+    divided_stdin_data = stdin_data.map do
+      [_1]
+    end
+    displayed_data = create_display_stdin_data(divided_stdin_data)
+    displayed_data.each do
+      print _1.to_s.rjust(8.5)
+    end
   end
 end
 
-def load_file_data
-  ARGV.map do
-    File.read(_1)
-  end
-end
-
-# 引数で渡されたファイルを調べる
-def create_display_data(loaded_files)
+def create_display_file_data(file)
   display_data = []
   if !WC_OPTIONS.values.any?
-    display_data.push(count_lines(loaded_files), count_words(loaded_files), count_characters(loaded_files))
+    display_data.push(count_file_lines(file), count_file_words(file), count_file_characters(file))
   else
-    display_data << count_lines(loaded_files) if WC_OPTIONS['l']
-    display_data << count_words(loaded_files) if WC_OPTIONS['w']
-    display_data << count_characters(loaded_files) if WC_OPTIONS['c']
+    display_data << count_file_lines(file) if WC_OPTIONS['l']
+    display_data << count_file_words(file) if WC_OPTIONS['w']
+    display_data << count_file_characters(file) if WC_OPTIONS['c']
   end
   display_data
-end
-
-# 標準入力を調べる
-def input_count(params)
-  divided_standard_input = params.map do
-    [_1]
-  end
-  divided_standard_input
-  info_to_display = []
-  if !WC_OPTIONS.values.any?
-    info_to_display << count_displayed_line(divided_standard_input)
-    info_to_display << count_displayed_word(divided_standard_input)
-    info_to_display << count_displayed_character(divided_standard_input)
-  else
-    info_to_display << count_displayed_line(divided_standard_input) if WC_OPTIONS['l']
-    info_to_display << count_displayed_word(divided_standard_input) if WC_OPTIONS['w']
-    info_to_display << count_displayed_character(divided_standard_input) if WC_OPTIONS['c']
-  end
-  displayed_standard_input(info_to_display)
-end
-
-def displayed_standard_input(info_to_display)
-  info_to_display.each do |row|
-      print row.to_s.rjust(8.5)
-  end
-end
-
-def count_displayed_line(divided_standard_input)
-  divided_standard_input.count
-end
-
-def count_displayed_word(divided_standard_input)
-  word_counts = divided_standard_input.map do |line|
-    line.join.scan(/\S+/).count
-  end
-  word_counts.sum
-end
-
-def count_displayed_character(divided_standard_input)
-  divided_standard_input.flatten.join.size
 end
 
 def display(displayed_data)
@@ -94,23 +55,20 @@ def display(displayed_data)
 end
 
 def calculate_total_value(displayed_data)
-  sum_files = displayed_data.map(&:sum)
-  displayed_arg_info = displayed_data.each_with_index { |row,i |
-    row << sum_files[i]
+  column_total_count = displayed_data.map(&:sum)
+  added_total_count_data = displayed_data.each_with_index { |column,index |
+    column << column_total_count[index]
   }
-  # debugger
-  last_columns = ARGV.map do
+  file_name = ARGV.map do
     " #{File.path(_1)}"
   end
+  last_columns = file_name
   last_columns << " total"
-  displayed_arg_info << last_columns
-  # debugger
+  added_total_count_data << last_columns
 end
 
-# 行数
-def count_lines(files)
+def count_file_lines(files)
   new_lines = files.map do |file|
-    # _1.lines.join.scan(/\n/).count
     file.lines.map do |line|
       line.scan(/\n$/)
     end
@@ -121,21 +79,44 @@ def count_lines(files)
   count_new_lines
 end
 
-# 単語数
-def count_words(files)
+def count_file_words(files)
   files_words = files.map do
     _1.split(/\s+/).size
   end
-    files_words
+  files_words
 end
 
-# 文字数
-def count_characters(files)
+def count_file_characters(files)
   files_characters = files.map do
-    # _1.split(/\s+/).join.chars.size
     _1.size
   end
-    files_characters
+  files_characters
+end
+
+def create_display_stdin_data(stdin_data)
+  display_data = []
+  if !WC_OPTIONS.values.any?
+    display_data.push(count_stdin_line(stdin_data), count_stdin_word(stdin_data), count_stdin_character(stdin_data))
+  else
+    display_data << count_stdin_line(stdin_data) if WC_OPTIONS['l']
+    display_data << count_stdin_word(stdin_data) if WC_OPTIONS['w']
+    display_data << count_stdin_character(stdin_data) if WC_OPTIONS['c']
+  end
+end
+
+def count_stdin_line(divided_standard_input)
+  divided_standard_input.count
+end
+
+def count_stdin_word(divided_standard_input)
+  word_counts = divided_standard_input.map do |line|
+    line.join.scan(/\S+/).count
+  end
+  word_counts.sum
+end
+
+def count_stdin_character(divided_standard_input)
+  divided_standard_input.flatten.join.size
 end
 
 main
