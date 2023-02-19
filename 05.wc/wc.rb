@@ -4,21 +4,42 @@
 require 'optparse'
 require 'debug'
 
-PARAMS = ARGV.getopts('l', 'w', 'c')
+WC_OPTIONS = ARGV.getopts('l', 'w', 'c')
 
 def main
   if ARGV.any?
-    info_to_display = file_count
-    displayed_arg_info = if info_to_display[0].count > 1
-                           calc_arg_info(info_to_display)
+    loaded_files = load_file_data
+    displayed_data = create_display_data(loaded_files)
+    displayed_data_by_condition = if loaded_files.count >= 2
+                           calculate_total_value(displayed_data)
                          else
-                           info_to_display << [" #{File.path(ARGV[0])}"]
+                           file_name = File.path(ARGV[0])
+                           displayed_data << [" #{file_name}"]
                          end
-    displayed_wc(displayed_arg_info)
+    display(displayed_data_by_condition)
   else
     params = $stdin.readlines
     input_count(params)
   end
+end
+
+def load_file_data
+  ARGV.map do
+    File.read(_1)
+  end
+end
+
+# 引数で渡されたファイルを調べる
+def create_display_data(loaded_files)
+  display_data = []
+  if !WC_OPTIONS.values.any?
+    display_data.push(count_lines(loaded_files), count_words(loaded_files), count_characters(loaded_files))
+  else
+    display_data << count_lines(loaded_files) if WC_OPTIONS['l']
+    display_data << count_words(loaded_files) if WC_OPTIONS['w']
+    display_data << count_characters(loaded_files) if WC_OPTIONS['c']
+  end
+  display_data
 end
 
 # 標準入力を調べる
@@ -28,14 +49,14 @@ def input_count(params)
   end
   divided_standard_input
   info_to_display = []
-  if !PARAMS.values.any?
+  if !WC_OPTIONS.values.any?
     info_to_display << count_displayed_line(divided_standard_input)
     info_to_display << count_displayed_word(divided_standard_input)
     info_to_display << count_displayed_character(divided_standard_input)
   else
-    info_to_display << count_displayed_line(divided_standard_input) if PARAMS['l']
-    info_to_display << count_displayed_word(divided_standard_input) if PARAMS['w']
-    info_to_display << count_displayed_character(divided_standard_input) if PARAMS['c']
+    info_to_display << count_displayed_line(divided_standard_input) if WC_OPTIONS['l']
+    info_to_display << count_displayed_word(divided_standard_input) if WC_OPTIONS['w']
+    info_to_display << count_displayed_character(divided_standard_input) if WC_OPTIONS['c']
   end
   displayed_standard_input(info_to_display)
 end
@@ -61,39 +82,20 @@ def count_displayed_character(divided_standard_input)
   divided_standard_input.flatten.join.size
 end
 
-
-# 引数で渡されたファイルを調べる
-def file_count
-  loaded_files = ARGV.map do
-    File.read(_1)
-  end
-  info_to_display = []
-  if !PARAMS.values.any?
-    info_to_display << count_lines(loaded_files)
-    info_to_display << count_words(loaded_files)
-    info_to_display << count_characters(loaded_files)
-  else
-    info_to_display << count_lines(loaded_files) if PARAMS['l']
-    info_to_display << count_words(loaded_files) if PARAMS['w']
-    info_to_display << count_characters(loaded_files) if PARAMS['c']
-  end
-  info_to_display
-end
-
-def displayed_wc(displayed_arg_info)
-  displayed_count = PARAMS.values.count(true) + 1
-  displayed_count = 4 if PARAMS.values.count(true) == 0
-  displayed_arg_info.transpose.each do |rows|
-    rows.each.with_index(1) do |row, i|
-      print row.to_s.rjust(8.5) if i % displayed_count != 0
-      print "#{row}\n" if i % displayed_count == 0
+def display(displayed_data)
+  received_wc_option_count = WC_OPTIONS.values.count(true)
+  column_count = received_wc_option_count == 0 ? 4 : received_wc_option_count + 1
+  displayed_data.transpose.each do |rows|
+    rows.each.with_index(1) do |row, index|
+      print row.to_s.rjust(8.5) if index % column_count != 0
+      print "#{row}\n" if index % column_count == 0
     end
   end
 end
 
-def calc_arg_info(info_to_display)
-  sum_files = info_to_display.map(&:sum)
-  displayed_arg_info = info_to_display.each_with_index { |row,i |
+def calculate_total_value(displayed_data)
+  sum_files = displayed_data.map(&:sum)
+  displayed_arg_info = displayed_data.each_with_index { |row,i |
     row << sum_files[i]
   }
   # debugger
