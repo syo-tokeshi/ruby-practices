@@ -9,7 +9,11 @@ PARAMS = ARGV.getopts('l', 'w', 'c')
 def main
   if ARGV.any?
     info_to_display = file_count
-    displayed_arg_info = calc_arg_info(info_to_display)
+    displayed_arg_info = if info_to_display[0].count > 1
+                           calc_arg_info(info_to_display)
+                         else
+                           info_to_display << [" #{File.path(ARGV[0])}"]
+                         end
     displayed_wc(displayed_arg_info)
   else
     params = $stdin.readlines
@@ -62,10 +66,16 @@ end
 
 # 行数
 def count_lines(files)
-  files_lines = files.map do
-    _1.lines.count
+  new_lines = files.map do |file|
+    # _1.lines.join.scan(/\n/).count
+    file.lines.map do |line|
+      line.scan(/\n$/)
+    end
   end
-    files_lines
+  count_new_lines = new_lines.map do |line|
+    line.flatten.count("\n")
+  end
+  count_new_lines
 end
 
 # 単語数
@@ -79,8 +89,8 @@ end
 # 文字数
 def count_characters(files)
   files_characters = files.map do
-    _1.split(/\s+/).join.chars.size
-    # debugger
+    # _1.split(/\s+/).join.chars.size
+    _1.size
   end
     files_characters
 end
