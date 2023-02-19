@@ -107,19 +107,19 @@ def create_display_stdin_data(stdin_data)
   display_data
 end
 
-def count_stdin_line(divided_standard_input)
-  divided_standard_input.count
+def count_stdin_line(divided_stdin)
+  divided_stdin.count
 end
 
-def count_stdin_word(divided_standard_input)
-  word_counts = divided_standard_input.map do |line|
+def count_stdin_word(divided_stdin)
+  word_counts = divided_stdin.map do |line|
     line.join.scan(/\S+/).count
   end
   word_counts.sum
 end
 
-def count_stdin_character(divided_standard_input)
-  divided_standard_input.flatten.join.size
+def count_stdin_character(divided_stdin)
+  divided_stdin.flatten.join.size
 end
 
 main
