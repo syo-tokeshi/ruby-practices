@@ -19,7 +19,7 @@ def exec_file_process
   end
   displayed_data = create_display_file_data(loaded_files)
   displayed_data_by_condition = if loaded_files.count >= 2
-                                  calculate_total_value(displayed_data)
+                                  calculate_total_data(displayed_data)
                                 else
                                   file_name = File.path(ARGV[0])
                                   displayed_data << [" #{file_name}"]
@@ -54,14 +54,14 @@ def display_file_data(file_data)
   received_wc_option_count = WC_OPTIONS.values.count(true)
   column_count = received_wc_option_count.zero? ? 4 : received_wc_option_count + 1
   file_data.transpose.each do |rows|
-    rows.each.with_index(1) do |row, index|
-      print row.to_s.rjust(8.5) if index % column_count != 0
-      print "#{row}\n" if (index % column_count).zero?
+    rows.each.with_index(1) do |cell, index|
+      print cell.to_s.rjust(8.5) if index % column_count != 0
+      print "#{cell}\n" if (index % column_count).zero?
     end
   end
 end
 
-def calculate_total_value(displayed_data)
+def calculate_total_data(displayed_data)
   column_total_count = displayed_data.map(&:sum)
   added_total_count_data = displayed_data.each_with_index do |column, index|
     column << column_total_count[index]
