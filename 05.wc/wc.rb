@@ -20,7 +20,7 @@ def exec_file_process
     File.read(_1)
   end
   displayed_data = create_display_file_data(loaded_files)
-  displayed_data_by_condition = if loaded_files.count >= 2
+  displayed_data_by_condition = if loaded_files.count >= 2 # 本物のwcは、ファイルの数が2以上じゃないと合計値を出さない
                                   calculate_total_data(displayed_data)
                                 else
                                   file_name = File.path(ARGV[0])
@@ -54,7 +54,7 @@ end
 
 def display_file_data(file_data)
   received_wc_option_count = WC_OPTIONS.values.count(true)
-  column_count = received_wc_option_count.zero? ? MAX_COLUMN_COUNT : received_wc_option_count + 1
+  column_count = received_wc_option_count.zero? ? MAX_COLUMN_COUNT : received_wc_option_count + 1 # wcのオプションの数 + 渡されたパスが表示されるので
   file_data.transpose.each do |rows|
     rows.each.with_index(1) do |cell, index|
       print cell.to_s.rjust(DISPLAYED_WIDTH) if index % column_count != 0
