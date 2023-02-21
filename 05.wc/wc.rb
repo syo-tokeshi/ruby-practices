@@ -3,6 +3,8 @@
 
 require 'optparse'
 
+MAX_COLUMN_COUNT = 4
+DISPLAYED_WIDTH = 8.5
 WC_OPTIONS = ARGV.getopts('l', 'w', 'c')
 
 def main
@@ -34,7 +36,7 @@ def exec_stdin_process
   end
   displayed_data = create_display_stdin_data(divided_stdin_data)
   displayed_data.each do
-    print _1.to_s.rjust(8.5)
+    print _1.to_s.rjust(DISPLAYED_WIDTH)
   end
 end
 
@@ -52,10 +54,10 @@ end
 
 def display_file_data(file_data)
   received_wc_option_count = WC_OPTIONS.values.count(true)
-  column_count = received_wc_option_count.zero? ? 4 : received_wc_option_count + 1
+  column_count = received_wc_option_count.zero? ? MAX_COLUMN_COUNT : received_wc_option_count + 1
   file_data.transpose.each do |rows|
     rows.each.with_index(1) do |cell, index|
-      print cell.to_s.rjust(8.5) if index % column_count != 0
+      print cell.to_s.rjust(DISPLAYED_WIDTH) if index % column_count != 0
       print "#{cell}\n" if (index % column_count).zero?
     end
   end
