@@ -8,6 +8,3 @@ class Shot
     mark.to_i
   end
 end
-shot = Shot.new('X')
-p shot.mark
-p shot.score
