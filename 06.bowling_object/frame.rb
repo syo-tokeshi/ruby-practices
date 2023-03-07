@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative 'shot'
-
 class Frame
   attr_reader :shots
 
