@@ -1,20 +1,14 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require_relative 'score'
 require_relative 'shot'
 require_relative 'frame'
 require_relative 'game'
 
-scores = ARGV[0]
-divided_scores = scores.split(',')
+score = Score.new(ARGV[0])
 
-processed_scores = divided_scores.map do |score|
-  score == 'X' ? %w[10 0] : score
-end
-
-processed_flat_score = processed_scores.flatten
-
-shots = processed_flat_score.map do |s|
+shots = score.scores.map do |s|
   Shot.new(s)
 end
 
