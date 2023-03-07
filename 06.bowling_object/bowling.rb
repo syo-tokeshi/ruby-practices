@@ -4,15 +4,13 @@
 require_relative 'shot'
 require_relative 'frame'
 require_relative 'game'
-require 'debug'
 
 args = ARGV[0]
-
 scores_before_processed = args.split(',')
 
-scores_after_processed = scores_before_processed.map { |score|
-  score == "X" ?  %w[10 0] : score
-}
+scores_after_processed = scores_before_processed.map do |score|
+  score == 'X' ? %w[10 0] : score
+end
 
 bowling_score = scores_after_processed.flatten
 
