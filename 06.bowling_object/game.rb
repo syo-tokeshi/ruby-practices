@@ -7,13 +7,13 @@ class Game
     @frames = frames
   end
 
-  def score
+  def calculate_frames
     total_point = 0
     @frames.each.with_index(1) do |frame, index|
-      total_point += frame.sum_frame
+      total_point += frame.sum_shots
       if frame.shots[0].mark == 10 && index < 10 # ストライクの処理
         total_point += process_in_strike(index)
-      elsif frame.sum_frame == 10 && index < 10 # スペアの処理
+      elsif frame.sum_shots == 10 && index < 10 # スペアの処理
         total_point += process_in_spare(index)
       end
     end
@@ -24,7 +24,7 @@ class Game
     if @frames[index].shots[0].mark == 10
       10 + @frames[index + 1].shots[0].mark # ダブルなので、2つ後の値も入れる
     else
-      @frames[index].sum_frame
+      @frames[index].sum_shots
     end
   end
 

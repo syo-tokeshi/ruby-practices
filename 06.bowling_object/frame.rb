@@ -7,7 +7,7 @@ class Frame
     @shots = shots
   end
 
-  def sum_frame
+  def sum_shots
     @shots.map(&:mark).sum
   end
 end

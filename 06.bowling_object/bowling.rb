@@ -5,23 +5,22 @@ require_relative 'shot'
 require_relative 'frame'
 require_relative 'game'
 
-args = ARGV[0]
-scores_before_processed = args.split(',')
+scores = ARGV[0]
+divided_scores = scores.split(',')
 
-scores_after_processed = scores_before_processed.map do |score|
+processed_scores = divided_scores.map do |score|
   score == 'X' ? %w[10 0] : score
 end
 
-bowling_score = scores_after_processed.flatten
+processed_flat_score = processed_scores.flatten
 
-shots = bowling_score.map do |s|
+shots = processed_flat_score.map do |s|
   Shot.new(s)
 end
 
-frames = []
-shots.each_slice(2) do |s|
-  frames << Frame.new(s)
+frames = shots.each_slice(2).map do |s|
+  Frame.new(s)
 end
 
 game = Game.new(frames)
-p game.score
+p game.calculate_frames
