@@ -10,17 +10,19 @@ class ArgvParser
     @parsed_argv = parse_argv(divided_argv)
   end
 
-  def unexpected_args?(command_line_argv)
-    command_line_argv.split(',').grep_v(/[0-9X]/).any?
+  private
+
+  def parse_argv(divided_argv)
+    divided_argv.map do |argv|
+      argv == 'X' ? %w[10 0] : argv
+    end.flatten
   end
 
   def divide_argv(command_line_argv)
     command_line_argv.split(',')
   end
 
-  def parse_argv(divided_argv)
-    divided_argv.map do |argv|
-      argv == 'X' ? %w[10 0] : argv
-    end.flatten
+  def unexpected_args?(command_line_argv)
+    command_line_argv.split(',').grep_v(/[0-9X]/).any?
   end
 end

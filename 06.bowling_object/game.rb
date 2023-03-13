@@ -18,15 +18,17 @@ class Game
     total_point
   end
 
+  private
+
+  def calc_spare_except_last_frame(index)
+    @frames[index].shots[0].point
+  end
+
   def calc_strike_except_last_frame(index)
     if @frames[index].shots[0].point == 10
       10 + @frames[index + 1].shots[0].point # ダブルなので、2つ後の値も入れる
     else
       @frames[index].sum_shots
     end
-  end
-
-  def calc_spare_except_last_frame(index)
-    @frames[index].shots[0].point
   end
 end
