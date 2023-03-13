@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 class Shot
-  attr_reader :mark
+  attr_reader :point
 
-  def initialize(mark)
-    @mark = mark.to_i
+  def initialize(point)
+    @point = point.to_i
   end
 end

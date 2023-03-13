@@ -8,6 +8,6 @@ class Frame
   end
 
   def sum_shots
-    @shots.map(&:mark).sum
+    @shots.map(&:point).sum
   end
 end
