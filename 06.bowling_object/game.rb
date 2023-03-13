@@ -1,8 +1,18 @@
 # frozen_string_literal: true
 
+require_relative 'argv_parser'
+require_relative 'shot'
+require_relative 'frame'
+
 class Game
-  def initialize(frames)
-    @frames = frames
+  def initialize(argv)
+    argv = ArgvParser.new(argv)
+    shots = argv.parsed_argv.map do |s|
+      Shot.new(s)
+    end
+    @frames = shots.each_slice(2).map do |s|
+      Frame.new(s)
+    end
   end
 
   def calc_frames
