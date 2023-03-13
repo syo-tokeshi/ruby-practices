@@ -17,4 +17,4 @@ frames = shots.each_slice(2).map do |s|
 end
 
 game = Game.new(frames)
-p game.calculate_frames
+p game.calc_frames
