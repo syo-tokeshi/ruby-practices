@@ -1,14 +1,14 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require_relative 'score'
+require_relative 'argv_parser'
 require_relative 'shot'
 require_relative 'frame'
 require_relative 'game'
 
-score = Score.new(ARGV[0])
+argv = ArgvParser.new(ARGV[0])
 
-shots = score.scores.map do |s|
+shots = argv.parsed_argv.map do |s|
   Shot.new(s)
 end
 
