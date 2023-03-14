@@ -12,6 +12,7 @@ class GameTest < Test::Unit::TestCase
     @game5 = Game.new('6,3,9,0,0,3,8,2,7,3,X,9,1,8,0,X,X,1,8')
     @game6 = Game.new('X,X,X,X,X,X,X,X,X,X,X,X')
     @game7 = Game.new('0,0,0,0,0,0,0,0,0,0,0,0')
+    @game8 = Game.new('1,2,3') # 引数が少なくても計算出来る事を確認
   end
 
   def test_calc_game1
@@ -43,6 +44,11 @@ class GameTest < Test::Unit::TestCase
   end
 
   def test_calc_game8
+    assert_equal(6, @game8.calc_frames)
+    assert_not_equal(5, @game8.calc_frames)
+  end
+
+  def test_calc_game9
     e = assert_raises ArgumentError do
       Game.new('x,z,0,100,X,X,X,X,X,X,X,X')
     end
