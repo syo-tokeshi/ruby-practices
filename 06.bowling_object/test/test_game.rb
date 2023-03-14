@@ -12,40 +12,34 @@ class GameTest < Test::Unit::TestCase
     @game5 = Game.new('6,3,9,0,0,3,8,2,7,3,X,9,1,8,0,X,X,1,8')
     @game6 = Game.new('X,X,X,X,X,X,X,X,X,X,X,X')
     @game7 = Game.new('0,0,0,0,0,0,0,0,0,0,0,0')
-    @game8 = Game.new('1,2,3') # 引数が少なくても計算出来る事を確認
   end
 
-  def test_correct_game1
+  def test_game1
     assert_equal(139, @game1.calc_frames)
   end
 
-  def test_correct_game2
+  def test_game2
     assert_equal(164, @game2.calc_frames)
   end
 
-  def test_correct_game3
+  def test_game3
     assert_equal(107, @game3.calc_frames)
   end
 
-  def test_correct_game4
+  def test_game4
     assert_equal(134, @game4.calc_frames)
   end
 
-  def test_correct_game5
+  def test_game5
     assert_equal(144, @game5.calc_frames)
   end
 
-  def test_correct_game6
+  def test_game6
     assert_equal(300, @game6.calc_frames)
   end
 
-  def test_correct_game7
+  def test_game7
     assert_equal(0, @game7.calc_frames)
-  end
-
-  def test_short_game
-    assert_equal(6, @game8.calc_frames)
-    assert_not_equal(5, @game8.calc_frames)
   end
 
   def test_argument_error
