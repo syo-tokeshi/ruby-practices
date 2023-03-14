@@ -4,42 +4,39 @@ require 'test/unit'
 require_relative '../game'
 
 class GameTest < Test::Unit::TestCase
-  def setup
-    @game1 = Game.new('6,3,9,0,0,3,8,2,7,3,X,9,1,8,0,X,6,4,5')
-    @game2 = Game.new('6,3,9,0,0,3,8,2,7,3,X,9,1,8,0,X,X,X,X')
-    @game3 = Game.new('0,10,1,5,0,0,0,0,X,X,X,5,1,8,1,0,4')
-    @game4 = Game.new('6,3,9,0,0,3,8,2,7,3,X,9,1,8,0,X,X,0,0')
-    @game5 = Game.new('6,3,9,0,0,3,8,2,7,3,X,9,1,8,0,X,X,1,8')
-    @game6 = Game.new('X,X,X,X,X,X,X,X,X,X,X,X')
-    @game7 = Game.new('0,0,0,0,0,0,0,0,0,0,0,0')
-  end
-
   def test_game1
-    assert_equal(139, @game1.calc_frames)
+    game1 = Game.new('6,3,9,0,0,3,8,2,7,3,X,9,1,8,0,X,6,4,5')
+    assert_equal(139, game1.calc_frames)
   end
 
   def test_game2
-    assert_equal(164, @game2.calc_frames)
+    game2 = Game.new('6,3,9,0,0,3,8,2,7,3,X,9,1,8,0,X,X,X,X')
+    assert_equal(164, game2.calc_frames)
   end
 
   def test_game3
-    assert_equal(107, @game3.calc_frames)
+    game3 = Game.new('0,10,1,5,0,0,0,0,X,X,X,5,1,8,1,0,4')
+    assert_equal(107, game3.calc_frames)
   end
 
   def test_game4
-    assert_equal(134, @game4.calc_frames)
+    game4 = Game.new('6,3,9,0,0,3,8,2,7,3,X,9,1,8,0,X,X,0,0')
+    assert_equal(134, game4.calc_frames)
   end
 
   def test_game5
-    assert_equal(144, @game5.calc_frames)
+    game5 = Game.new('6,3,9,0,0,3,8,2,7,3,X,9,1,8,0,X,X,1,8')
+    assert_equal(144, game5.calc_frames)
   end
 
   def test_game6
-    assert_equal(300, @game6.calc_frames)
+    game6 = Game.new('X,X,X,X,X,X,X,X,X,X,X,X')
+    assert_equal(300, game6.calc_frames)
   end
 
   def test_game7
-    assert_equal(0, @game7.calc_frames)
+    game7 = Game.new('0,0,0,0,0,0,0,0,0,0,0,0')
+    assert_equal(0, game7.calc_frames)
   end
 
   def test_argument_error
