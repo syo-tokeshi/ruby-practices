@@ -69,7 +69,7 @@ class Ls
     sliced_file_names.transpose
   end
 
-  def files(file_names)
+  def get_files_with_detailed_info(file_names)
     file_names.map { |file_name| File::Stat.new(file_name) }
   end
 
@@ -156,8 +156,8 @@ class Ls
     files.map { |file| File.basename(file) }
   end
 
-  def get_file_informations(file_name)
-    files = files(file_name)
+  def get_file_informations(file_names)
+    files = get_files_with_detailed_info(file_names)
     blocks = blocks(files)
     modes = modes(files)
     types = types(modes)
@@ -167,7 +167,7 @@ class Ls
     groups = groups(files)
     sizes = sizes(files)
     mtimes = mtimes(files)
-    file_names = file_names(file_name)
+    file_names = file_names(file_names)
     [blocks, file_names, groups, mtimes, nlinks, permissions, sizes, types, users]
   end
 end
