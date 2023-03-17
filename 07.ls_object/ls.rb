@@ -5,6 +5,7 @@ require 'optparse'
 require 'etc'
 require 'date'
 require 'debug'
+require_relative 'file_information'
 
 class Ls
   def initialize(options, path = nil)
@@ -35,9 +36,13 @@ class Ls
 
   def output_detail(files)
     file_names = get_file_names(files)
-    blocks, file_names, groups, mtimes, nlinks, permissions, sizes, types, users = get_file_informations(file_names)
-    puts "total #{blocks.sum}" if blocks.length > 1
-    [types, permissions, nlinks, users, groups, sizes, mtimes, file_names].transpose.each { |details| puts details.join }
+    file_informations = get_file_informations(file_names)
+    file_informations.map do |file_info|
+      # debugger
+      blocks, file_names, groups, mtimes, nlinks, permissions, sizes, types, users = file_info
+      puts [types, permissions, nlinks, users, groups, sizes, mtimes, file_names].join
+    end
+    # puts "total #{blocks.sum}" if blocks.length > 1
   end
 
   def output_without_detail(files)
@@ -69,65 +74,9 @@ class Ls
     sliced_file_names.transpose
   end
 
-  def get_files_with_detailed_info(file_names)
-    file_names.map { |file_name| File::Stat.new(file_name) }
-  end
-
-  def blocks(files)
-    files.map(&:blocks)
-  end
-
-  def modes(files)
-    files.map { |file| file.mode.to_s(8).rjust(6, '0') }
-  end
-
-  def types(modes)
-    modes.map do |mode|
-      {
-        '02' => 'c',
-        '04' => 'd',
-        '01' => 'p',
-        '06' => 'b',
-        '10' => '-',
-        '12' => 'l',
-        '14' => 's'
-      }[mode.slice(0, 2)]
-    end
-  end
-
-  def permissions(modes)
-    modes.map do |mode|
-      permissions = mode.slice(3, 3).chars.map do |file_permission|
-        [file_permission.to_i.to_s(2).rjust(3, '0').chars, %w[r w x]].transpose.map do |array_judgable_permission|
-          array_judgable_permission[0] == '1' ? array_judgable_permission[1] : '-'
-        end
-      end
-      permissions.join
-    end
-  end
-
-  def nlinks(files)
-    align_files(files.map { |file| file.nlink.to_s }, 1)
-  end
-
-  def users(files)
-    align_files(files.map { |file| Etc.getpwuid(file.uid).name })
-  end
-
-  def groups(files)
-    align_files(files.map { |file| Etc.getgrgid(file.gid).name }, 2)
-  end
-
-  def sizes(files)
-    align_files(files.map { |file| file.size.to_s }, 2)
-  end
-
-  def mtimes(files)
-    files.map { |file| Date.today.year ? file.mtime.strftime('%_m %e %H:%M') : file.mtime.strftime('%_m %e  %Y') }
-  end
-
-  def file_names(files)
-    files.map { |file| file.prepend(' ') }
+  def get_detailed_files(file_names)
+    detailed_files = file_names.map { |file_name| FileInformation.new(File::Stat.new(file_name),file_name) }
+    detailed_files.map { |file| file.informations}
   end
 
   private
@@ -157,17 +106,6 @@ class Ls
   end
 
   def get_file_informations(file_names)
-    files = get_files_with_detailed_info(file_names)
-    blocks = blocks(files)
-    modes = modes(files)
-    types = types(modes)
-    permissions = permissions(modes)
-    nlinks = nlinks(files)
-    users = users(files)
-    groups = groups(files)
-    sizes = sizes(files)
-    mtimes = mtimes(files)
-    file_names = file_names(file_names)
-    [blocks, file_names, groups, mtimes, nlinks, permissions, sizes, types, users]
+    get_detailed_files(file_names)
   end
 end
