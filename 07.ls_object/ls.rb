@@ -35,26 +35,14 @@ class Ls
   end
 
   def output_detail(files)
-    file_name = files.map { |file| File.basename(file) }
-
-    files = files(file_name)
-    blocks = blocks(files)
-    modes = modes(files)
-    types = types(modes)
-    permissions = permissions(modes)
-    nlinks = nlinks(files)
-    users = users(files)
-    groups = groups(files)
-    sizes = sizes(files)
-    mtimes = mtimes(files)
-    file_names = file_names(file_name)
-
+    file_names = get_file_names(files)
+    blocks, file_names, groups, mtimes, nlinks, permissions, sizes, types, users = get_file_informations(file_names)
     puts "total #{blocks.sum}" if blocks.length > 1
     [types, permissions, nlinks, users, groups, sizes, mtimes, file_names].transpose.each { |details| puts details.join }
   end
 
   def output_without_detail(files)
-    file_names = files.map { |file| File.basename(file) }
+    file_names = get_file_names(files)
     aligned_file_names = align_files(file_names, 1, right_justified_flag: false)
     transposed_file_names = transpose_file_names(aligned_file_names)
     transposed_file_names.each do |columns|
@@ -80,7 +68,6 @@ class Ls
     sliced_file_names = file_names.each_slice(row_count).to_a
     (row_count - sliced_file_names[-1].length).times { sliced_file_names[-1] << '' }
     sliced_file_names.transpose
-    # debugger
   end
 
   def files(file_names)
@@ -142,5 +129,26 @@ class Ls
 
   def file_names(files)
     files.map { |file| file.prepend(' ') }
+  end
+
+  private
+
+  def get_file_names(files)
+    files.map { |file| File.basename(file) }
+  end
+
+  def get_file_informations(file_name)
+    files = files(file_name)
+    blocks = blocks(files)
+    modes = modes(files)
+    types = types(modes)
+    permissions = permissions(modes)
+    nlinks = nlinks(files)
+    users = users(files)
+    groups = groups(files)
+    sizes = sizes(files)
+    mtimes = mtimes(files)
+    file_names = file_names(file_name)
+    return blocks, file_names, groups, mtimes, nlinks, permissions, sizes, types, users
   end
 end
