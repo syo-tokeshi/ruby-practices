@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 require 'etc'
 require 'debug'
 require_relative 'ls'
 
 class FileInformation
-  def initialize(detailed_file,file_name)
+  def initialize(detailed_file, file_name)
     @blocks = blocks(detailed_file)
     @mode = mode(detailed_file)
-    @type = type(@mode)
+    @type = type(@mode, file_name)
     @permissions = permissions(@mode)
     @nlink = nlink(detailed_file)
     @user = user(detailed_file)
@@ -17,8 +19,10 @@ class FileInformation
   end
 
   def informations
-    [@blocks, @file_name, @group, @mtime, @nlink, @permissions, @size, @type, @user]
+    [@blocks, @type, @permissions, @nlink, @user, @group, @size, @mtime, @file_name]
   end
+
+  private
 
   def blocks(file)
     file.blocks
@@ -28,47 +32,44 @@ class FileInformation
     file.mode.to_s(8).rjust(6, '0')
   end
 
-  def type(mode)
-      {
-        '02' => 'c',
-        '04' => 'd',
-        '01' => 'p',
-        '06' => 'b',
-        '10' => '-',
-        '12' => 'l',
-        '14' => 's'
-      }[mode.slice(0, 2)]
+  def type(mode, file_name)
+    return 'l' if FileTest.symlink?(file_name)
+
+    {
+      '04' => 'd',
+      '10' => '-'
+    }[mode.slice(0, 2)]
   end
 
   def permissions(mode)
-      permissions = mode.slice(3, 3).chars.map do |file_permission|
-        [file_permission.to_i.to_s(2).rjust(3, '0').chars, %w[r w x]].transpose.map do |array_judgable_permission|
-          array_judgable_permission[0] == '1' ? array_judgable_permission[1] : '-'
-        end
+    permissions = mode.slice(3, 3).chars.map do |file_permission|
+      [file_permission.to_i.to_s(2).rjust(3, '0').chars, %w[r w x]].transpose.map do |array_judgable_permission|
+        array_judgable_permission[0] == '1' ? array_judgable_permission[1] : '-'
       end
-      permissions.join
+    end
+    permissions.join
   end
 
   def nlink(file)
-    align_files(file.nlink.to_s, 1)
+    file.nlink.to_s.rjust(3)
   end
 
-  def align_files(file_informations, added_space = 1, right_justified_flag: true)
-    word_counts = get_word_counts(file_informations)
+  def align_files(file_info, added_space = 1, right_justified_flag: true)
+    word_counts = get_word_counts(file_info)
     max_length = get_max_length(added_space, word_counts)
-      if right_justified_flag
-        file_informations.rjust(max_length)
-      else
-        file_informations.ljust(max_length)
-      end
+    if right_justified_flag
+      file_info.rjust(max_length)
+    else
+      file_info.ljust(max_length)
+    end
+  end
+
+  def get_word_counts(file)
+    file.size
   end
 
   def get_max_length(added_space, word_counts)
     word_counts + added_space
-  end
-
-  def get_word_counts(file)
-    file.bytesize + file.length / 2
   end
 
   def user(file)
@@ -80,7 +81,7 @@ class FileInformation
   end
 
   def size(file)
-    align_files(file.size.to_s, 2)
+    file.size.to_s.rjust(6)
   end
 
   def mtime(file)
@@ -88,7 +89,8 @@ class FileInformation
   end
 
   def displayed_filename(file)
+    return " #{file} -> #{File.readlink(file)}" if FileTest.symlink?(file)
+
     file.prepend(' ')
   end
-
 end

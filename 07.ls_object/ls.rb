@@ -20,8 +20,14 @@ class Ls
     @is_detailed ? output_detail(files) : output_without_detail(files)
   end
 
+  private
+
   def get_files_from_path(path, is_dotmatch)
     dotmatch_pattern = is_dotmatch ? File::FNM_DOTMATCH : 0
+    files(path, dotmatch_pattern)
+  end
+
+  def files(path, dotmatch_pattern)
     files = if path.nil?
               Dir.glob('*', dotmatch_pattern)
             elsif FileTest.directory? path
@@ -37,12 +43,12 @@ class Ls
   def output_detail(files)
     file_names = get_file_names(files)
     file_informations = get_file_informations(file_names)
+    total_blocks = get_total_blocks(file_informations)
+    puts "total #{total_blocks}" if total_blocks > 1
     file_informations.map do |file_info|
-      # debugger
-      blocks, file_names, groups, mtimes, nlinks, permissions, sizes, types, users = file_info
+      types, permissions, nlinks, users, groups, sizes, mtimes, file_names = file_info[1..]
       puts [types, permissions, nlinks, users, groups, sizes, mtimes, file_names].join
     end
-    # puts "total #{blocks.sum}" if blocks.length > 1
   end
 
   def output_without_detail(files)
@@ -79,7 +85,9 @@ class Ls
     detailed_files.map { |file| file.informations}
   end
 
-  private
+  def get_total_blocks(file_informations)
+    file_informations.map { |file_info| file_info[0] }.sum
+  end
 
   def offset_for_transpose(row_count, sliced_file_names)
     (row_count - sliced_file_names[-1].length).times { sliced_file_names[-1] << '' }
@@ -98,7 +106,7 @@ class Ls
   end
 
   def get_word_counts(file_informations)
-    file_informations.map { |file_info| (file_info.bytesize + file_info.length) / 2 }
+    file_informations.map { |file_info| file_info.size }
   end
 
   def get_file_names(files)
