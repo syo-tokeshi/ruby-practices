@@ -53,7 +53,7 @@ class Ls
 
   def output_without_detail(files)
     file_names = get_file_names(files)
-    aligned_file_names = align_files(file_names, 1, right_justified_flag: false)
+    aligned_file_names = align_file_names(file_names, 1, right_justified_flag: false)
     transposed_file_names = transpose_file_names(aligned_file_names)
     transposed_file_names.each do |columns|
       columns.each { |file_name| print file_name }
@@ -61,16 +61,24 @@ class Ls
     end
   end
 
-  def align_files(file_informations, added_space = 1, right_justified_flag: true)
-    word_counts = get_word_counts(file_informations)
+  def align_file_names(file_names, added_space = 1, right_justified_flag: true)
+    word_counts = get_word_counts(file_names)
     max_length = get_max_length(added_space, word_counts)
-    file_informations.map do |file_info|
+    file_names.map do |file_info|
       if right_justified_flag
         file_info.rjust(max_length)
       else
         file_info.ljust(max_length)
       end
     end
+  end
+
+  def get_word_counts(file_informations)
+    file_informations.map(&:size)
+  end
+
+  def get_max_length(added_space, word_counts)
+    word_counts.max + added_space
   end
 
   def transpose_file_names(file_names, column_count = 3)
@@ -81,8 +89,8 @@ class Ls
   end
 
   def get_detailed_files(file_names)
-    detailed_files = file_names.map { |file_name| FileInformation.new(File::Stat.new(file_name),file_name) }
-    detailed_files.map { |file| file.informations}
+    detailed_files = file_names.map { |file_name| FileInformation.new(File::Stat.new(file_name), file_name) }
+    detailed_files.map(&:informations)
   end
 
   def get_total_blocks(file_informations)
@@ -99,14 +107,6 @@ class Ls
 
   def get_row_count(column_count, file_names)
     file_names.length.quo(column_count).ceil
-  end
-
-  def get_max_length(added_space, word_counts)
-    word_counts.max + added_space
-  end
-
-  def get_word_counts(file_informations)
-    file_informations.map { |file_info| file_info.size }
   end
 
   def get_file_names(files)

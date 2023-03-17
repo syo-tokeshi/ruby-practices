@@ -51,11 +51,11 @@ class FileInformation
   end
 
   def nlink(file)
-    file.nlink.to_s.rjust(3)
+    file.nlink.to_s.rjust(4)
   end
 
-  def align_files(file_info, added_space = 1, right_justified_flag: true)
-    word_counts = get_word_counts(file_info)
+  def align_file_info(file_info, added_space = 1, right_justified_flag: true)
+    word_counts = get_word_count(file_info)
     max_length = get_max_length(added_space, word_counts)
     if right_justified_flag
       file_info.rjust(max_length)
@@ -64,8 +64,8 @@ class FileInformation
     end
   end
 
-  def get_word_counts(file)
-    file.size
+  def get_word_count(file_info)
+    file_info.size
   end
 
   def get_max_length(added_space, word_counts)
@@ -73,11 +73,11 @@ class FileInformation
   end
 
   def user(file)
-    align_files(Etc.getpwuid(file.uid).name)
+    align_file_info(Etc.getpwuid(file.uid).name)
   end
 
   def group(file)
-    align_files(Etc.getgrgid(file.gid).name, 2)
+    align_file_info(Etc.getgrgid(file.gid).name, 2)
   end
 
   def size(file)
