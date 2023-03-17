@@ -7,12 +7,11 @@ require 'date'
 require 'debug'
 
 class Ls
-
-  def initialize(path = nil, is_dotmatch = false, is_reversed = false, is_detailed = false)
+  def initialize(options, path = nil)
     @path = path
-    @is_dotmatch = is_dotmatch
-    @is_reversed = is_reversed
-    @is_detailed = is_detailed
+    @is_dotmatch = options['a']
+    @is_reversed = options['r']
+    @is_detailed = options['l']
   end
 
   def output
@@ -23,14 +22,14 @@ class Ls
   def get_files_from_path(path, is_dotmatch)
     dotmatch_pattern = is_dotmatch ? File::FNM_DOTMATCH : 0
     files = if path.nil?
-      Dir.glob('*', dotmatch_pattern)
-    elsif FileTest.directory? path
-      Dir.glob(File.join(path, '*'), dotmatch_pattern)
-    elsif FileTest.file? path
-      [path]
-    else
-      raise ArgumentError "ls: #{ARGV[0]}: No such file or directory"
-    end
+              Dir.glob('*', dotmatch_pattern)
+            elsif FileTest.directory? path
+              Dir.glob(File.join(path, '*'), dotmatch_pattern)
+            elsif FileTest.file? path
+              [path]
+            else
+              raise ArgumentError "ls: #{ARGV[0]}: No such file or directory"
+            end
     @is_reversed ? files.reverse! : files
   end
 
@@ -169,6 +168,6 @@ class Ls
     sizes = sizes(files)
     mtimes = mtimes(files)
     file_names = file_names(file_name)
-    return blocks, file_names, groups, mtimes, nlinks, permissions, sizes, types, users
+    [blocks, file_names, groups, mtimes, nlinks, permissions, sizes, types, users]
   end
 end
