@@ -43,7 +43,7 @@ class Ls
     file_names = get_file_names(files)
     detailed_files = get_detailed_files(file_names)
     total_blocks = get_total_blocks(detailed_files)
-    puts "total #{total_blocks}" if FileTest.directory?(@path)
+    puts "total #{total_blocks}"
     detailed_files.map do |detailed_file|
       types, permission, nlink, user, group, size, mtime, file_name = detailed_file[1..]
       puts [types, permission, nlink, user, group, size, mtime, file_name].join

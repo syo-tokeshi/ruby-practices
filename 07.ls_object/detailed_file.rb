@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'etc'
-require_relative 'ls'
 
 class DetailedFile
   def initialize(detailed_file, file_name)
