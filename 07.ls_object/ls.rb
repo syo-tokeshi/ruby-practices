@@ -44,7 +44,7 @@ class Ls
     file_names = get_file_names(files)
     file_informations = get_file_informations(file_names)
     total_blocks = get_total_blocks(file_informations)
-    puts "total #{total_blocks}" if total_blocks > 1
+    puts "total #{total_blocks}"
     file_informations.map do |file_info|
       types, permissions, nlinks, users, groups, sizes, mtimes, file_names = file_info[1..]
       puts [types, permissions, nlinks, users, groups, sizes, mtimes, file_names].join
@@ -89,8 +89,14 @@ class Ls
   end
 
   def get_detailed_files(file_names)
-    detailed_files = file_names.map { |file_name| FileInformation.new(File::Stat.new(file_name), file_name) }
+    detailed_files = file_names.map do |file_name|
+      @path.nil? ? create_detailed_files(file_name) : create_detailed_files("#{@path}/#{file_name}")
+    end
     detailed_files.map(&:informations)
+  end
+
+  def create_detailed_files(file_name)
+    FileInformation.new(File::Stat.new(file_name), file_name)
   end
 
   def get_total_blocks(file_informations)
