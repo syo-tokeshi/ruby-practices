@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 require 'optparse'
-require_relative 'ls_manager'
+require_relative '../lib/ls_manager'
 
 OPTIONS = ARGV.getopts('a', 'r', 'l')
 
