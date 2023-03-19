@@ -2,7 +2,7 @@
 
 require 'etc'
 
-class DetailedFile
+class DetailedFileManager
   def initialize(detailed_file, file_name)
     @blocks = blocks(detailed_file)
     @mode = mode(detailed_file)
@@ -87,6 +87,6 @@ class DetailedFile
   def displayed_filename(file)
     return " #{file} -> #{File.readlink(file)}" if FileTest.symlink?(file)
 
-    file.prepend(' ')
+    " #{file}"
   end
 end
