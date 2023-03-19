@@ -4,8 +4,7 @@
 require 'optparse'
 require 'etc'
 require 'date'
-require 'debug'
-require_relative 'file_information'
+require_relative 'detailed_file'
 
 class Ls
   def initialize(options, path = nil)
@@ -42,12 +41,12 @@ class Ls
 
   def output_detail(files)
     file_names = get_file_names(files)
-    file_informations = get_file_informations(file_names)
-    total_blocks = get_total_blocks(file_informations)
-    puts "total #{total_blocks}"
-    file_informations.map do |file_info|
-      types, permissions, nlinks, users, groups, sizes, mtimes, file_names = file_info[1..]
-      puts [types, permissions, nlinks, users, groups, sizes, mtimes, file_names].join
+    detailed_files = get_detailed_files(file_names)
+    total_blocks = get_total_blocks(detailed_files)
+    puts "total #{total_blocks}" if FileTest.directory?(@path)
+    detailed_files.map do |detailed_file|
+      types, permission, nlink, user, group, size, mtime, file_name = detailed_file[1..]
+      puts [types, permission, nlink, user, group, size, mtime, file_name].join
     end
   end
 
@@ -62,23 +61,23 @@ class Ls
   end
 
   def align_file_names(file_names, added_space = 1, right_justified_flag: true)
-    word_counts = get_word_counts(file_names)
-    max_length = get_max_length(added_space, word_counts)
-    file_names.map do |file_info|
+    file_name_lengths = get_file_name_lengths(file_names)
+    displayed_length = get_displayed_length(added_space, file_name_lengths)
+    file_names.map do |file_name|
       if right_justified_flag
-        file_info.rjust(max_length)
+        file_name.rjust(displayed_length)
       else
-        file_info.ljust(max_length)
+        file_name.ljust(displayed_length)
       end
     end
   end
 
-  def get_word_counts(file_informations)
-    file_informations.map(&:size)
+  def get_file_name_lengths(file_names)
+    file_names.map(&:length)
   end
 
-  def get_max_length(added_space, word_counts)
-    word_counts.max + added_space
+  def get_displayed_length(added_space, file_name_lengths)
+    file_name_lengths.max + added_space
   end
 
   def transpose_file_names(file_names, column_count = 3)
@@ -90,17 +89,21 @@ class Ls
 
   def get_detailed_files(file_names)
     detailed_files = file_names.map do |file_name|
-      @path.nil? ? create_detailed_files(file_name) : create_detailed_files("#{@path}/#{file_name}")
+      create_detailed_files(file_name)
     end
     detailed_files.map(&:informations)
   end
 
   def create_detailed_files(file_name)
-    FileInformation.new(File::Stat.new(file_name), file_name)
+    if @path.nil? || FileTest.file?(@path)
+      DetailedFile.new(File::Stat.new(file_name), file_name)
+    elsif FileTest.directory? @path
+      DetailedFile.new(File::Stat.new("#{@path}/#{file_name}"), file_name)
+    end
   end
 
-  def get_total_blocks(file_informations)
-    file_informations.map { |file_info| file_info[0] }.sum
+  def get_total_blocks(detailed_files)
+    detailed_files.map { |detailed_file| detailed_file[0] }.sum
   end
 
   def offset_for_transpose(row_count, sliced_file_names)
@@ -117,9 +120,5 @@ class Ls
 
   def get_file_names(files)
     files.map { |file| File.basename(file) }
-  end
-
-  def get_file_informations(file_names)
-    get_detailed_files(file_names)
   end
 end

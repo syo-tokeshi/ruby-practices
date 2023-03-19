@@ -1,15 +1,14 @@
 # frozen_string_literal: true
 
 require 'etc'
-require 'debug'
 require_relative 'ls'
 
-class FileInformation
+class DetailedFile
   def initialize(detailed_file, file_name)
     @blocks = blocks(detailed_file)
     @mode = mode(detailed_file)
     @type = type(@mode, file_name)
-    @permissions = permissions(@mode)
+    @permission = permission(@mode)
     @nlink = nlink(detailed_file)
     @user = user(detailed_file)
     @group = group(detailed_file)
@@ -19,7 +18,7 @@ class FileInformation
   end
 
   def informations
-    [@blocks, @type, @permissions, @nlink, @user, @group, @size, @mtime, @file_name]
+    [@blocks, @type, @permission, @nlink, @user, @group, @size, @mtime, @file_name]
   end
 
   private
@@ -41,11 +40,17 @@ class FileInformation
     }[mode.slice(0, 2)]
   end
 
-  def permissions(mode)
-    permissions = mode.slice(3, 3).chars.map do |file_permission|
-      [file_permission.to_i.to_s(2).rjust(3, '0').chars, %w[r w x]].transpose.map do |array_judgable_permission|
-        array_judgable_permission[0] == '1' ? array_judgable_permission[1] : '-'
-      end
+  def permission(mode)
+    permissions = mode.slice(3, 3).chars.map do |permission|
+      {
+        '0' => '---',
+        '1' => 'x--',
+        '2' => 'w--',
+        '4' => 'r--',
+        '5' => 'r-x',
+        '6' => 'rw-',
+        '7' => 'rwx'
+      }[permission]
     end
     permissions.join
   end
@@ -55,21 +60,13 @@ class FileInformation
   end
 
   def align_file_info(file_info, added_space = 1, right_justified_flag: true)
-    word_counts = get_word_count(file_info)
-    max_length = get_max_length(added_space, word_counts)
+    file_info_length = file_info.length
+    max_length = file_info_length + added_space
     if right_justified_flag
       file_info.rjust(max_length)
     else
       file_info.ljust(max_length)
     end
-  end
-
-  def get_word_count(file_info)
-    file_info.size
-  end
-
-  def get_max_length(added_space, word_counts)
-    word_counts + added_space
   end
 
   def user(file)
