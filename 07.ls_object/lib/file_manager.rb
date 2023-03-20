@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'detailed_file_manager'
+
 class FileManager
   attr_reader :lists
 
@@ -16,7 +17,7 @@ class FileManager
     detailed_files = lists.map do |list|
       create_detailed_files(list, path)
     end
-    detailed_files.map(&:informations)
+    detailed_files.map(&:attributes)
   end
 
   def get_total_blocks(detailed_files)

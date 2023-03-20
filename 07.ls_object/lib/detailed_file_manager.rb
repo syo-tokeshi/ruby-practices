@@ -16,7 +16,7 @@ class DetailedFileManager
     @file_name = displayed_filename(file_name)
   end
 
-  def informations
+  def attributes
     [@blocks, @type, @permission, @nlink, @user, @group, @size, @mtime, @file_name]
   end
 
@@ -58,22 +58,22 @@ class DetailedFileManager
     file.nlink.to_s.rjust(4)
   end
 
-  def align_file_info(file_info, added_space = 1, right_justified_flag: true)
-    file_info_length = file_info.length
-    max_length = file_info_length + added_space
+  def align_file_attribute(file_attribute, added_space = 1, right_justified_flag: true)
+    file_attribute_length = file_attribute.length
+    max_length = file_attribute_length + added_space
     if right_justified_flag
-      file_info.rjust(max_length)
+      file_attribute.rjust(max_length)
     else
-      file_info.ljust(max_length)
+      file_attribute.ljust(max_length)
     end
   end
 
   def user(file)
-    align_file_info(Etc.getpwuid(file.uid).name)
+    align_file_attribute(Etc.getpwuid(file.uid).name)
   end
 
   def group(file)
-    align_file_info(Etc.getgrgid(file.gid).name, 2)
+    align_file_attribute(Etc.getgrgid(file.gid).name, 2)
   end
 
   def size(file)
