@@ -13,7 +13,7 @@ class DetailedFileManager
     @group = group(detailed_file)
     @size = size(detailed_file)
     @mtime = mtime(detailed_file)
-    @file_name = displayed_filename(file_name)
+    @file_name = displayed_file_name(file_name)
   end
 
   def attributes
@@ -84,7 +84,7 @@ class DetailedFileManager
     Date.today.year ? file.mtime.strftime('%_m %e %H:%M') : file.mtime.strftime('%_m %e  %Y')
   end
 
-  def displayed_filename(file)
+  def displayed_file_name(file)
     return " #{file} -> #{File.readlink(file)}" if FileTest.symlink?(file)
 
     " #{file}"

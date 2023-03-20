@@ -3,18 +3,18 @@
 require_relative 'detailed_file_manager'
 
 class FileManager
-  attr_reader :lists
+  attr_reader :files
 
   def initialize(files)
-    @lists = files
+    @files = files
   end
 
   def file_names
-    lists.map { |list| File.basename(list) }
+    files.map { |list| File.basename(list) }
   end
 
   def get_detailed_files(path)
-    detailed_files = lists.map do |list|
+    detailed_files = files.map do |list|
       create_detailed_files(list, path)
     end
     detailed_files.map(&:attributes)
