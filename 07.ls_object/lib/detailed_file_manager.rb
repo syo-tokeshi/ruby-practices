@@ -81,7 +81,7 @@ class DetailedFileManager
   end
 
   def mtime(file)
-    Date.today.year ? file.mtime.strftime('%_m %e %H:%M') : file.mtime.strftime('%_m %e  %Y')
+    file.mtime.strftime('%_m %_d %H:%M')
   end
 
   def displayed_file_name(file)
