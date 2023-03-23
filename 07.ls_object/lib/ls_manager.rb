@@ -4,8 +4,8 @@
 require 'optparse'
 require 'etc'
 require 'date'
-require_relative 'detailed_file_manager'
-require_relative 'file_manager'
+require_relative 'file_metadata'
+require_relative 'files_formatter'
 
 class LsManager
   def initialize(options, path = nil)
@@ -16,13 +16,13 @@ class LsManager
   end
 
   def output
-    files = get_files_from_path
+    files = files_by_option_and_path
     @is_detailed ? output_detail(files) : output_without_detail(files)
   end
 
   private
 
-  def get_files_from_path
+  def files_by_option_and_path
     dotmatch_pattern = @is_dotmatch ? File::FNM_DOTMATCH : 0
     files = if @path.nil?
               Dir.glob('*', dotmatch_pattern)

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'detailed_file_manager'
+require_relative 'file_metadata'
 
 class FilesFormatter
   attr_reader :files
@@ -25,8 +25,7 @@ class FilesFormatter
   end
 
   def align_file_names(added_space: 8)
-    file_name_lengths = get_file_name_lengths
-    displayed_length = get_displayed_length(file_name_lengths, added_space)
+    displayed_length = get_displayed_length(added_space)
     file_names.map do |file_name|
       file_name.ljust(displayed_length)
     end
@@ -51,11 +50,11 @@ class FilesFormatter
     end
   end
 
-  def get_file_name_lengths
+  def file_name_lengths
     file_names.map(&:length)
   end
 
-  def get_displayed_length(file_name_lengths, added_space)
+  def get_displayed_length(added_space)
     file_name_lengths.max + added_space
   end
 
