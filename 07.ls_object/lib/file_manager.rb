@@ -2,7 +2,7 @@
 
 require_relative 'detailed_file_manager'
 
-class FileManager
+class FilesFormatter
   attr_reader :files
 
   def initialize(files)
@@ -10,11 +10,11 @@ class FileManager
   end
 
   def file_names
-    files.map { |list| File.basename(list) }
+    @files.map { |list| File.basename(list) }
   end
 
   def get_detailed_files(path)
-    detailed_files = files.map do |list|
+    detailed_files = @files.map do |list|
       create_detailed_files(list, path)
     end
     detailed_files.map(&:attributes)
@@ -24,21 +24,18 @@ class FileManager
     detailed_files.map { |detailed_file| detailed_file[0] }.sum
   end
 
-  def align_file_names(file_names, added_space: 8, right_justified_flag: true)
-    file_name_lengths = get_file_name_lengths(file_names)
+  def align_file_names(added_space: 8)
+    file_name_lengths = get_file_name_lengths
     displayed_length = get_displayed_length(file_name_lengths, added_space)
     file_names.map do |file_name|
-      if right_justified_flag
-        file_name.rjust(displayed_length)
-      else
-        file_name.ljust(displayed_length)
-      end
+      file_name.ljust(displayed_length)
     end
   end
 
-  def transpose_file_names(file_names, column_count = 3)
-    row_count = get_row_count(column_count, file_names)
-    sliced_file_names = slice_file_names(file_names, row_count)
+  def displayed_file_names(column_count = 3)
+    aligned_file_names = align_file_names
+    row_count = get_row_count(column_count, aligned_file_names)
+    sliced_file_names = slice_file_names(aligned_file_names, row_count)
     offset_for_transpose(row_count, sliced_file_names)
     sliced_file_names.transpose
   end
@@ -47,14 +44,14 @@ class FileManager
 
   def create_detailed_files(file_name, path)
     if path.nil? || FileTest.file?(path)
-      DetailedFileManager.new(File::Stat.new(file_name), file_name)
+      FileMetadata.new(File::Stat.new(file_name), file_name)
     elsif FileTest.directory? path
       displayed_file_name = file_name.delete(path)[1..]
-      DetailedFileManager.new(File::Stat.new(file_name), displayed_file_name)
+      FileMetadata.new(File::Stat.new(file_name), displayed_file_name)
     end
   end
 
-  def get_file_name_lengths(file_names)
+  def get_file_name_lengths
     file_names.map(&:length)
   end
 

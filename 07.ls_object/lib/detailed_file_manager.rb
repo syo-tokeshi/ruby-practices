@@ -2,7 +2,7 @@
 
 require 'etc'
 
-class DetailedFileManager
+class FileMetadata
   def initialize(detailed_file, file_name)
     @blocks = blocks(detailed_file)
     @mode = mode(detailed_file)

@@ -16,25 +16,25 @@ class LsManager
   end
 
   def output
-    files = get_files_from_path(@path, @is_dotmatch)
+    files = get_files_from_path
     @is_detailed ? output_detail(files) : output_without_detail(files)
   end
 
   private
 
-  def get_files_from_path(path, is_dotmatch)
-    dotmatch_pattern = is_dotmatch ? File::FNM_DOTMATCH : 0
-    files = if path.nil?
+  def get_files_from_path
+    dotmatch_pattern = @is_dotmatch ? File::FNM_DOTMATCH : 0
+    files = if @path.nil?
               Dir.glob('*', dotmatch_pattern)
-            elsif FileTest.directory? path
-              Dir.glob(File.join(path, '*'), dotmatch_pattern)
-            elsif FileTest.file? path
-              [path]
+            elsif FileTest.directory? @path
+              Dir.glob(File.join(@path, '*'), dotmatch_pattern)
+            elsif FileTest.file? @path
+              [@path]
             else
               raise ArgumentError "ls: #{ARGV[0]}: No such file or directory"
             end
     @is_reversed ? files.reverse! : files
-    FileManager.new(files)
+    FilesFormatter.new(files)
   end
 
   def output_detail(files)
@@ -42,16 +42,12 @@ class LsManager
     total_blocks = files.get_total_blocks(detailed_files)
     puts "total #{total_blocks}"
     detailed_files.map do |detailed_file|
-      types, permission, nlink, user, group, size, mtime, file_name = detailed_file[1..]
-      puts [types, permission, nlink, user, group, size, mtime, file_name].join
+      puts detailed_file[1..].join
     end
   end
 
   def output_without_detail(files)
-    file_names = files.file_names
-    aligned_file_names = files.align_file_names(file_names, added_space: 8, right_justified_flag: false)
-    transposed_file_names = files.transpose_file_names(aligned_file_names)
-    transposed_file_names.each do |columns|
+    files.displayed_file_names.each do |columns|
       columns.each { |file_name| print file_name }
       print "\n"
     end
