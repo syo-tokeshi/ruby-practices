@@ -4,7 +4,8 @@
 require 'optparse'
 require_relative '../lib/ls_manager'
 
-OPTIONS = ARGV.getopts('a', 'r', 'l')
+options = ARGV.getopts('a', 'r', 'l')
+path = ARGV[0]
 
-ls_manager = LsManager.new(OPTIONS, ARGV[0])
-ls_manager.output
+ls_manager = LsManager.new(options, path)
+ls_manager.exec

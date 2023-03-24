@@ -15,10 +15,10 @@ class LsManager
     @is_detailed = options['l']
   end
 
-  def output
+  def exec
     files = files_by_option_and_path
-    formatted_files_from_now = parse_formatted_files(files)
-    @is_detailed ? output_detail(formatted_files_from_now) : output_without_detail(formatted_files_from_now)
+    files_formatter = parse_files_formatter(files)
+    @is_detailed ? files_formatter.output_with_metadatas(@path) : files_formatter.output_without_metadatas
   end
 
   private
@@ -37,23 +37,7 @@ class LsManager
     @is_reversed ? files.reverse! : files
   end
 
-  def parse_formatted_files(files)
+  def parse_files_formatter(files)
     FilesFormatter.new(files)
-  end
-
-  def output_detail(files)
-    files_with_metadatas = files.get_files_with_metadatas(@path)
-    total_blocks = files.get_total_blocks(files_with_metadatas)
-    puts "total #{total_blocks}"
-    files_with_metadatas.each do |file_with_metadatas|
-      puts file_with_metadatas[1..].join
-    end
-  end
-
-  def output_without_detail(files)
-    files.file_names_for_display.each do |columns|
-      columns.each { |file_name| print file_name }
-      print "\n"
-    end
   end
 end

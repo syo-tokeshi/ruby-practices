@@ -9,6 +9,24 @@ class FilesFormatter
     @files = files
   end
 
+  def output_with_metadatas(path)
+    files_with_metadatas = get_files_with_metadatas(path)
+    total_blocks = get_total_blocks(files_with_metadatas)
+    puts "total #{total_blocks}"
+    files_with_metadatas.each do |file_with_metadatas|
+      puts file_with_metadatas[1..].join
+    end
+  end
+
+  def output_without_metadatas
+    file_names_for_display.each do |columns|
+      columns.each { |file_name| print file_name }
+      print "\n"
+    end
+  end
+
+  private
+
   def file_names
     @files.map { |list| File.basename(list) }
   end
@@ -20,15 +38,17 @@ class FilesFormatter
     files_with_metadata.map(&:metadatas)
   end
 
-  def get_total_blocks(files_with_metadata)
-    files_with_metadata.sum { |detailed_file| detailed_file[0] }
+  def parse_file_with_metadatas(file_name, path)
+    if path.nil? || FileTest.file?(path)
+      FileMetadata.new(file_name)
+    elsif FileTest.directory? path
+      file_name_when_directory = file_name.delete(path)[1..]
+      FileMetadata.new(file_name, file_name_when_directory)
+    end
   end
 
-  def align_file_names(added_space: 8)
-    displayed_length = get_displayed_length(added_space)
-    file_names.map do |file_name|
-      file_name.ljust(displayed_length)
-    end
+  def get_total_blocks(files_with_metadata)
+    files_with_metadata.sum { |detailed_file| detailed_file[0] }
   end
 
   def file_names_for_display(column_count = 3)
@@ -39,23 +59,19 @@ class FilesFormatter
     sliced_file_names.transpose
   end
 
-  private
-
-  def parse_file_with_metadatas(file_name, path)
-    if path.nil? || FileTest.file?(path)
-      FileMetadata.new(file_name)
-    elsif FileTest.directory? path
-      file_name_when_directory = file_name.delete(path)[1..]
-      FileMetadata.new(file_name, file_name_when_directory)
+  def align_file_names(added_space: 8)
+    displayed_length = get_displayed_length(added_space)
+    file_names.map do |file_name|
+      file_name.ljust(displayed_length)
     end
-  end
-
-  def file_name_lengths
-    file_names.map(&:length)
   end
 
   def get_displayed_length(added_space)
     file_name_lengths.max + added_space
+  end
+
+  def file_name_lengths
+    file_names.map(&:length)
   end
 
   def get_row_count(column_count, file_names)
