@@ -3,7 +3,6 @@
 
 require 'optparse'
 require 'etc'
-require 'date'
 require_relative 'file_metadata'
 require_relative 'files_formatter'
 

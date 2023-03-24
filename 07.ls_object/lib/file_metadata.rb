@@ -66,22 +66,18 @@ class FileMetadata
     file.nlink.to_s.rjust(4)
   end
 
-  def align_file_attribute(file_attribute, added_space = 1, right_justified_flag: true)
-    file_attribute_length = file_attribute.length
-    max_length = file_attribute_length + added_space
-    if right_justified_flag
-      file_attribute.rjust(max_length)
-    else
-      file_attribute.ljust(max_length)
-    end
+  def align_file_metadata(file_metadata, added_space = 1)
+    file_metadata_length = file_metadata.length
+    max_length = file_metadata_length + added_space
+    file_metadata.rjust(max_length)
   end
 
   def get_user(file)
-    align_file_attribute(Etc.getpwuid(file.uid).name)
+    align_file_metadata(Etc.getpwuid(file.uid).name)
   end
 
   def get_group(file)
-    align_file_attribute(Etc.getgrgid(file.gid).name, 2)
+    align_file_metadata(Etc.getgrgid(file.gid).name, 2)
   end
 
   def get_size(file)
