@@ -9,11 +9,11 @@ class FilesFormatter
   end
 
   def output_with_metadatas(path)
-    files_with_metadatas = get_files_with_metadatas(path)
-    total_blocks = get_total_blocks(files_with_metadatas)
+    file_metadatas = get_file_metadatas(path)
+    total_blocks = file_metadatas.sum(&:blocks)
     puts "total #{total_blocks}"
-    files_with_metadatas.each do |file_with_metadatas|
-      puts file_with_metadatas[1..].join
+    file_metadatas.each do |file_metadata|
+      file_metadata.display
     end
   end
 
@@ -30,15 +30,10 @@ class FilesFormatter
     @file_names.map { |file_name| File.basename(file_name) }
   end
 
-  def get_files_with_metadatas(path)
-    file_metadatas = @file_names.map do |file_name|
-      FileMetadata.new(file_name,path)
+  def get_file_metadatas(path)
+    @file_names.map do |file_name|
+      FileMetadata.new(file_name, path)
     end
-    file_metadatas.map(&:metadatas)
-  end
-
-  def get_total_blocks(files_with_metadata)
-    files_with_metadata.sum { |detailed_file| detailed_file[0] }
   end
 
   def file_names_for_display(column_count = 3)
