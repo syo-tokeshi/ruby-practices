@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
 require 'etc'
-require 'debug'
 
 class FileMetadata
   attr_reader :blocks
 
-  def initialize(file_name,path)
+  def initialize(file_name, path)
     file_with_metadata = File::Stat.new(file_name)
     @blocks = get_blocks(file_with_metadata)
     @mode = get_mode(file_with_metadata)
@@ -17,18 +16,18 @@ class FileMetadata
     @group = get_group(file_with_metadata)
     @size = get_size(file_with_metadata)
     @mtime = get_mtime(file_with_metadata)
-    delete_directory_name(file_name, path) if path != nil && FileTest.directory?(path)
+    delete_directory_name(file_name, path) if !path.nil? && FileTest.directory?(path)
     @displayed_file_name = get_displayed_file_name(file_name)
   end
 
-  def display
-    puts [@type, @permission, @nlink, @user, @group, @size, @mtime, @file_name].join
+  def metadata
+    [@type, @permission, @nlink, @user, @group, @size, @mtime, @file_name].join
   end
 
   private
 
-  def delete_directory_name(file_name,path)
-    file_name.delete!(path + "/")
+  def delete_directory_name(file_name, path)
+    file_name.delete!("#{path}/")
   end
 
   def get_blocks(file)

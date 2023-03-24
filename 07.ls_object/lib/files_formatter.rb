@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative 'file_metadata'
-require 'debug'
 
 class FilesFormatter
   def initialize(file_names)
@@ -12,8 +11,8 @@ class FilesFormatter
     file_metadatas = get_file_metadatas(path)
     total_blocks = file_metadatas.sum(&:blocks)
     puts "total #{total_blocks}"
-    file_metadatas.each do |file_metadata|
-      file_metadata.display
+    file_metadatas.each do |file|
+      puts file.metadata
     end
   end
 
