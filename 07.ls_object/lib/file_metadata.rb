@@ -14,7 +14,7 @@ class FileMetadata
     @group = group(detailed_file)
     @size = size(detailed_file)
     @mtime = mtime(detailed_file)
-    @file_name = file_name_when_directory ? displayed_file_name(file_name_when_directory) : displayed_file_name(file_name)
+    @file_name = displayed_file_name(file_name_when_directory || file_name)
   end
 
   def metadatas

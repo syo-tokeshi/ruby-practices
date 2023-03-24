@@ -46,7 +46,7 @@ class FilesFormatter
       FileMetadata.new(file_name)
     elsif FileTest.directory? path
       file_name_when_directory = file_name.delete(path)[1..]
-      FileMetadata.new(file_name,file_name_when_directory)
+      FileMetadata.new(file_name, file_name_when_directory)
     end
   end
 
