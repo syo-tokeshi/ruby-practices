@@ -17,7 +17,8 @@ class LsManager
 
   def output
     files = files_by_option_and_path
-    @is_detailed ? output_detail(files) : output_without_detail(files)
+    formatted_files_from_now = parse_formatted_files(files)
+    @is_detailed ? output_detail(formatted_files_from_now) : output_without_detail(formatted_files_from_now)
   end
 
   private
@@ -34,20 +35,23 @@ class LsManager
               raise ArgumentError "ls: #{ARGV[0]}: No such file or directory"
             end
     @is_reversed ? files.reverse! : files
+  end
+
+  def parse_formatted_files(files)
     FilesFormatter.new(files)
   end
 
   def output_detail(files)
-    detailed_files = files.get_detailed_files(@path)
-    total_blocks = files.get_total_blocks(detailed_files)
+    files_with_metadatas = files.get_files_with_metadatas(@path)
+    total_blocks = files.get_total_blocks(files_with_metadatas)
     puts "total #{total_blocks}"
-    detailed_files.map do |detailed_file|
-      puts detailed_file[1..].join
+    files_with_metadatas.each do |file_with_metadatas|
+      puts file_with_metadatas[1..].join
     end
   end
 
   def output_without_detail(files)
-    files.displayed_file_names.each do |columns|
+    files.file_names_for_display.each do |columns|
       columns.each { |file_name| print file_name }
       print "\n"
     end

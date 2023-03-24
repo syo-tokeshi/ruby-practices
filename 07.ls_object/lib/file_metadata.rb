@@ -16,7 +16,7 @@ class FileMetadata
     @file_name = displayed_file_name(file_name)
   end
 
-  def attributes
+  def metadatas
     [@blocks, @type, @permission, @nlink, @user, @group, @size, @mtime, @file_name]
   end
 

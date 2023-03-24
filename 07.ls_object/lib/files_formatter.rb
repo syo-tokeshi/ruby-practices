@@ -13,15 +13,15 @@ class FilesFormatter
     @files.map { |list| File.basename(list) }
   end
 
-  def get_detailed_files(path)
-    detailed_files = @files.map do |list|
-      create_detailed_files(list, path)
+  def get_files_with_metadatas(path)
+    files_with_metadata = @files.map do |file|
+      parse_file_with_metadatas(file, path)
     end
-    detailed_files.map(&:attributes)
+    files_with_metadata.map(&:metadatas)
   end
 
-  def get_total_blocks(detailed_files)
-    detailed_files.map { |detailed_file| detailed_file[0] }.sum
+  def get_total_blocks(files_with_metadata)
+    files_with_metadata.sum { |detailed_file| detailed_file[0] }
   end
 
   def align_file_names(added_space: 8)
@@ -31,7 +31,7 @@ class FilesFormatter
     end
   end
 
-  def displayed_file_names(column_count = 3)
+  def file_names_for_display(column_count = 3)
     aligned_file_names = align_file_names
     row_count = get_row_count(column_count, aligned_file_names)
     sliced_file_names = slice_file_names(aligned_file_names, row_count)
@@ -41,12 +41,12 @@ class FilesFormatter
 
   private
 
-  def create_detailed_files(file_name, path)
+  def parse_file_with_metadatas(file_name, path)
     if path.nil? || FileTest.file?(path)
       FileMetadata.new(File::Stat.new(file_name), file_name)
     elsif FileTest.directory? path
-      displayed_file_name = file_name.delete(path)[1..]
-      FileMetadata.new(File::Stat.new(file_name), displayed_file_name)
+      file_name_for_display = file_name.delete(path)[1..]
+      FileMetadata.new(File::Stat.new(file_name), file_name_for_display)
     end
   end
 
