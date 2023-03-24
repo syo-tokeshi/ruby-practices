@@ -3,17 +3,18 @@
 require 'etc'
 
 class FileMetadata
-  def initialize(detailed_file, file_name)
+  def initialize(file_name, file_name_when_directory = nil)
+    detailed_file = File::Stat.new(file_name)
     @blocks = blocks(detailed_file)
     @mode = mode(detailed_file)
-    @type = type(@mode, file_name)
+    @type = file_name_when_directory ? type(@mode, file_name_when_directory) : type(@mode, file_name)
     @permission = permission(@mode)
     @nlink = nlink(detailed_file)
     @user = user(detailed_file)
     @group = group(detailed_file)
     @size = size(detailed_file)
     @mtime = mtime(detailed_file)
-    @file_name = displayed_file_name(file_name)
+    @file_name = file_name_when_directory ? displayed_file_name(file_name_when_directory) : displayed_file_name(file_name)
   end
 
   def metadatas

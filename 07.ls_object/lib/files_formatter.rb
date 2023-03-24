@@ -43,10 +43,10 @@ class FilesFormatter
 
   def parse_file_with_metadatas(file_name, path)
     if path.nil? || FileTest.file?(path)
-      FileMetadata.new(File::Stat.new(file_name), file_name)
+      FileMetadata.new(file_name)
     elsif FileTest.directory? path
-      file_name_for_display = file_name.delete(path)[1..]
-      FileMetadata.new(File::Stat.new(file_name), file_name_for_display)
+      file_name_when_directory = file_name.delete(path)[1..]
+      FileMetadata.new(file_name,file_name_when_directory)
     end
   end
 
