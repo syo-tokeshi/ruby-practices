@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
 require_relative 'file_metadata'
+require 'debug'
 
 class FilesFormatter
-  attr_reader :files
-
-  def initialize(files)
-    @files = files
+  def initialize(file_names)
+    @file_names = file_names
   end
 
   def output_with_metadatas(path)
@@ -27,24 +26,15 @@ class FilesFormatter
 
   private
 
-  def file_names
-    @files.map { |list| File.basename(list) }
+  def file_base_names
+    @file_names.map { |file_name| File.basename(file_name) }
   end
 
   def get_files_with_metadatas(path)
-    files_with_metadata = @files.map do |file|
-      parse_file_with_metadatas(file, path)
+    file_metadatas = @file_names.map do |file_name|
+      FileMetadata.new(file_name,path)
     end
-    files_with_metadata.map(&:metadatas)
-  end
-
-  def parse_file_with_metadatas(file_name, path)
-    if path.nil? || FileTest.file?(path)
-      FileMetadata.new(file_name)
-    elsif FileTest.directory? path
-      file_name_when_directory = file_name.delete(path)[1..]
-      FileMetadata.new(file_name, file_name_when_directory)
-    end
+    file_metadatas.map(&:metadatas)
   end
 
   def get_total_blocks(files_with_metadata)
@@ -61,7 +51,7 @@ class FilesFormatter
 
   def align_file_names(added_space: 8)
     displayed_length = get_displayed_length(added_space)
-    file_names.map do |file_name|
+    file_base_names.map do |file_name|
       file_name.ljust(displayed_length)
     end
   end
@@ -71,7 +61,7 @@ class FilesFormatter
   end
 
   def file_name_lengths
-    file_names.map(&:length)
+    file_base_names.map(&:length)
   end
 
   def get_row_count(column_count, file_names)

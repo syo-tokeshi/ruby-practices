@@ -16,8 +16,8 @@ class LsManager
   end
 
   def exec
-    files = files_by_option_and_path
-    files_formatter = parse_files_formatter(files)
+    file_names = files_by_option_and_path
+    files_formatter = FilesFormatter.new(file_names)
     @is_detailed ? files_formatter.output_with_metadatas(@path) : files_formatter.output_without_metadatas
   end
 
@@ -35,9 +35,5 @@ class LsManager
               raise ArgumentError "ls: #{ARGV[0]}: No such file or directory"
             end
     @is_reversed ? files.reverse! : files
-  end
-
-  def parse_files_formatter(files)
-    FilesFormatter.new(files)
   end
 end
