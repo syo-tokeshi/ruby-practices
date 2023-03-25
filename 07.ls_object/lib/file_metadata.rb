@@ -20,7 +20,7 @@ class FileMetadata
   end
 
   def metadata
-    [@type, @permission, @nlink, @user, @group, @size, @mtime, @file_name, @displayed_file_name].join
+    [@type, @permission, @nlink, @user, @group, @size, @mtime, @displayed_file_name].join
   end
 
   private
