@@ -5,40 +5,31 @@ require 'etc'
 class FileMetadata
   attr_reader :blocks
 
-  def initialize(file_name, path)
+  def initialize(file_name)
     file_with_metadata = File::Stat.new(file_name)
-    @blocks = get_blocks(file_with_metadata)
-    @mode = get_mode(file_with_metadata)
-    @type = get_type(@mode, file_name)
-    @permission = get_permission(@mode)
-    @nlink = get_nlink(file_with_metadata)
-    @user = get_user(file_with_metadata)
-    @group = get_group(file_with_metadata)
-    @size = get_size(file_with_metadata)
-    @mtime = get_mtime(file_with_metadata)
-    delete_directory_name(file_name, path) if !path.nil? && FileTest.directory?(path)
-    @displayed_file_name = get_displayed_file_name(file_name)
+    @blocks = file_with_metadata.blocks
+    @mode = mode(file_with_metadata)
+    @type = type(@mode, file_name)
+    @permission = permission(@mode)
+    @nlink = nlink(file_with_metadata)
+    @user = user(file_with_metadata)
+    @group = group(file_with_metadata)
+    @size = size(file_with_metadata)
+    @mtime = mtime(file_with_metadata)
+    @displayed_file_name = displayed_file_name(File.basename(file_name))
   end
 
   def metadata
-    [@type, @permission, @nlink, @user, @group, @size, @mtime, @file_name].join
+    [@type, @permission, @nlink, @user, @group, @size, @mtime, @file_name, @displayed_file_name].join
   end
 
   private
 
-  def delete_directory_name(file_name, path)
-    file_name.delete!("#{path}/")
-  end
-
-  def get_blocks(file)
-    file.blocks
-  end
-
-  def get_mode(file)
+  def mode(file)
     file.mode.to_s(8).rjust(6, '0')
   end
 
-  def get_type(mode, file_name)
+  def type(mode, file_name)
     return 'l' if FileTest.symlink?(file_name)
 
     {
@@ -47,7 +38,7 @@ class FileMetadata
     }[mode.slice(0, 2)]
   end
 
-  def get_permission(mode)
+  def permission(mode)
     permissions = mode.slice(3, 3).chars.map do |permission|
       {
         '0' => '---',
@@ -62,7 +53,7 @@ class FileMetadata
     permissions.join
   end
 
-  def get_nlink(file)
+  def nlink(file)
     file.nlink.to_s.rjust(4)
   end
 
@@ -72,23 +63,23 @@ class FileMetadata
     file_metadata.rjust(max_length)
   end
 
-  def get_user(file)
+  def user(file)
     align_file_metadata(Etc.getpwuid(file.uid).name)
   end
 
-  def get_group(file)
+  def group(file)
     align_file_metadata(Etc.getgrgid(file.gid).name, 2)
   end
 
-  def get_size(file)
+  def size(file)
     file.size.to_s.rjust(6)
   end
 
-  def get_mtime(file)
+  def mtime(file)
     file.mtime.strftime('%_m %_d %H:%M')
   end
 
-  def get_displayed_file_name(file)
+  def displayed_file_name(file)
     return " #{file} -> #{File.readlink(file)}" if FileTest.symlink?(file)
 
     " #{file}"
