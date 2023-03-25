@@ -17,7 +17,7 @@ class LsManager
   def exec
     file_names = files_by_option_and_path
     files_formatter = FilesFormatter.new(file_names)
-    @is_detailed ? files_formatter.output_with_metadatas(@path) : files_formatter.output_without_metadatas
+    @is_detailed ? files_formatter.output_with_metadatas : files_formatter.output_without_metadatas
   end
 
   private

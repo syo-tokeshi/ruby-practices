@@ -7,8 +7,7 @@ class FilesFormatter
     @file_names = file_names
   end
 
-  def output_with_metadatas(path)
-    file_metadatas = get_file_metadatas(path)
+  def output_with_metadatas
     total_blocks = file_metadatas.sum(&:blocks)
     puts "total #{total_blocks}"
     file_metadatas.each do |file|
@@ -29,9 +28,9 @@ class FilesFormatter
     @file_names.map { |file_name| File.basename(file_name) }
   end
 
-  def get_file_metadatas(path)
+  def file_metadatas
     @file_names.map do |file_name|
-      FileMetadata.new(file_name, path)
+      FileMetadata.new(file_name)
     end
   end
 
