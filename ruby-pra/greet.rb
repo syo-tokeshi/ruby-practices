@@ -1,18 +1,21 @@
+# frozen_string_literal: true
+
 module Greet
   class << self
     def morning
-      "class morning!!"
+      'class morning!!'
     end
 
     def hello
-      "class hello!"
+      'class hello!'
     end
   end
 
   def morning
-    "instance morning!!"
+    'instance morning!!'
   end
+
   def hello
-    "instance hello!"
+    'instance hello!'
   end
 end

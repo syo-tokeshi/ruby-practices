@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require_relative 'children'
 
-toshi = Children.new("toshi", 19)
+toshi = Children.new('toshi', 19)
 p toshi.age
 p toshi.adult?
 toshi.twice_increment
